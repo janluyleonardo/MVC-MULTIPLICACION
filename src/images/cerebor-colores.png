@@ -1,0 +1,745 @@
+" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="security-realm" type="xs:string" use="optional"/>        
+    </xs:complexType>
+
+    <xs:complexType name="sasl">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                The configuration of the SASL authentication layer for this server.
+
+                The optional nested "include-mechanisms" element contains a whitelist of allowed SASL mechanism names.
+                No mechanisms will be allowed which are not present in this list.
+
+                The optional nested "qop" element contains a list of quality-of-protection values, in decreasing order
+                of preference.
+
+                The optional nested "strength" element contains a list of cipher strength values, in decreasing order
+                of preference.
+
+                The optional nested "reuse-session" boolean element specifies whether or not the server should attempt
+                to reuse previously authenticated session information.  The mechanism may or may not support such reuse,
+                and other factors may also prevent it.
+
+                The optional nested "server-auth" boolean element specifies whether the server should authenticate to the
+                client.  Not all mechanisms may support this setting.
+
+                The optional nested "policy" boolean element specifies a policy to use to narrow down the available set
+                of mechanisms.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="include-mechanisms" type="name-listType" minOccurs="0"/>
+            <xs:element name="qop" type="qop-listType" minOccurs="0"/>
+            <xs:element name="strength" type="strength" minOccurs="0"/>
+            <xs:element name="reuse-session" type="boolean-element" minOccurs="0"/>
+            <xs:element name="server-auth" type="boolean-element" minOccurs="0"/>
+            <xs:element name="policy" type="policy" minOccurs="0"/>
+            <xs:element name="properties" type="properties" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="policy">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                Policy criteria items to use in order to choose a SASL mechanism.
+
+                The optional nested "forward-secrecy" element contains a boolean value which specifies whether mechanisms
+                that implement forward secrecy between sessions are required. Forward secrecy means that breaking into
+                one session will not automatically provide information for breaking into future sessions.
+
+                The optional nested "no-active" element contains a boolean value which specifies whether mechanisms
+                susceptible to active (non-dictionary) attacks are not permitted.  "false" to permit, "true" to deny.
+
+                The optional nested "no-anonymous" element contains a boolean value which specifies whether mechanisms
+                that accept anonymous login are permitted.  "false" to permit, "true" to deny.
+
+                The optional nested "no-dictionary" element contains a boolean value which specifies whether mechanisms
+                susceptible to passive dictionary attacks are permitted.  "false" to permit, "true" to deny.
+
+                The optional nested "no-plain-text" element contains a boolean value which specifies whether mechanisms
+                susceptible to simple plain passive attacks (e.g., "PLAIN") are not permitted.    "false" to permit, "true" to deny.
+
+                The optional nested "pass-credentials" element contains a boolean value which specifies whether
+                mechanisms that pass client credentials are required.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="forward-secrecy" type="boolean-element" minOccurs="0"/>
+            <xs:element name="no-active" type="boolean-element" minOccurs="0"/>
+            <xs:element name="no-anonymous" type="boolean-element" minOccurs="0"/>
+            <xs:element name="no-dictionary" type="boolean-element" minOccurs="0"/>
+            <xs:element name="no-plain-text" type="boolean-element" minOccurs="0"/>
+            <xs:element name="pass-credentials" type="boolean-element" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="boolean-element">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                An element specifying a boolean value.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="value" type="xs:boolean" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="name-listType">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                An element specifying a string list.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="value" type="name-list" use="required"/>
+    </xs:complexType>   
+
+    <xs:simpleType name="name-list">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                A set of string items.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:list itemType="xs:string"/>
+    </xs:simpleType>
+
+    <xs:complexType name="qop-listType">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                An element specifying a qop list.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="value" type="qop-list" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="qop-list">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                The SASL quality-of-protection value list.  See http://download.oracle.com/docs/cd/E17409_01/javase/6/docs/api/javax/security/sasl/Sasl.html#QOP
+                for more information.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:list>
+            <xs:simpleType>
+                <xs:restriction base="xs:token">
+                    <xs:enumeration value="auth"/>
+                    <xs:enumeration value="auth-int"/>
+                    <xs:enumeration value="auth-conf"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:list>
+    </xs:simpleType>
+
+    <xs:simpleType name="strength">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                The SASL strength value list.  See http://download.oracle.com/docs/cd/E17409_01/javase/6/docs/api/javax/security/sasl/Sasl.html#STRENGTH
+                for more information.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:list>
+            <xs:simpleType>
+                <xs:restriction base="xs:token">
+                    <xs:enumeration value="low"/>
+                    <xs:enumeration value="medium"/>
+                    <xs:enumeration value="high"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:list>
+    </xs:simpleType>
+
+    <xs:complexType name="properties">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                A set of free-form properties.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="property" type="property"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="property">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                A free-form property.  The name is required; the value is optional.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="ref">
+        <xs:annotation>
+            <xs:documentation>
+            <![CDATA[
+                A reference to another named service.
+            ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="outbound-connectionsType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="local-outbound-connection" type="local-outbound-connectionType" />
+            <xs:element name="remote-outbound-connection" type="remote-outbound-connectionType" />
+            <xs:element name="outbound-connection" type="outbound-connectionType" />
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="base-outbound-connectionType">
+        <xs:all>
+            <xs:element name="properties" type="properties" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="outbound-connectionType">
+        <xs:complexContent>
+            <xs:extension base="base-outbound-connectionType">
+                <xs:attribute name="uri" type="xs:anyURI" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="local-outbound-connectionType">
+        <xs:complexContent>
+            <xs:extension base="base-outbound-connectionType">
+                <xs:attribute name="outbound-socket-binding-ref" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="remote-outbound-connectionType">
+        <xs:complexContent>
+            <xs:extension base="base-outbound-connectionType">
+                <xs:attribute name="outbound-socket-binding-ref" type="xs:string" use="required"/>
+                <xs:attribute name="username" type="xs:string" use="optional"/>
+                <xs:attribute name="security-realm" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2011, Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags. See the copyright.txt file in the
+  ~ distribution for a full listing of individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="urn:jboss:domain:resource-adapters:1.0" xmlns="urn:jboss:domain:resource-adapters:1.0"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <xs:element name="subsystem" type="subsystemType"/>
+
+  <xs:complexType name="subsystemType">
+    <xs:all>
+      <xs:element name="resource-adapters" type="resource-adaptersType" minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="boolean-presenceType"></xs:complexType>
+
+  <xs:complexType name="config-propertyType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[[
+          Specifies an override for a config-property element in ra.xml or a @ConfigProperty
+         ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute use="required" name="name" type="xs:token">
+          <xs:annotation>
+            <xs:documentation>
+              <![CDATA[[
+                Specifies the name of the config-property
+               ]]>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="resource-adapterType">
+    <xs:sequence>
+      <xs:element name="archive" type="xs:token" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies the resource adapter archive to be activated
+              E.g. <archive>myra.rar</archive>
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="bean-validation-groups" type="bean-validation-groupsType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies bean validation group that should be used
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="bootstrap-context" type="xs:token" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies the unique name of the bootstrap context that should be used
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="config-property" type="config-propertyType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+               The config-property specifies resource adapter configuration properties.
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="transaction-support" type="transaction-supportType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies the transaction support level of the resource adapter
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="connection-definitions" type="connection-definitionsType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies the connection definitions
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="admin-objects" type="admin-objectsType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies the administration objects
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="transaction-supportType">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[[
+          Define the type of transaction supported by this resource adapter.
+          Valid values are: NoTransaction, LocalTransaction, XATransaction
+         ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="NoTransaction" />
+      <xs:enumeration value="LocalTransaction" />
+      <xs:enumeration value="XATransaction" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="common-attribute">
+    <xs:attribute name="class-name" type="xs:token" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[[
+            Specifies the the fully qualified class name of a managed connection factory
+            or admin object
+           ]]>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="jndi-name" type="xs:token" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[[
+            Specifies the JNDI name
+           ]]>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="enabled" type="xs:boolean" default="true" form="unqualified" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[[
+            Should the object in question be activated
+           ]]>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute default="true" name="use-java-context" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[[
+            Specifies if a java:/ JNDI context should be used
+           ]]>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="pool-name" type="xs:token" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[[
+            Specifies the pool name for the object
+           ]]>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:complexType name="admin-objectType">
+    <xs:sequence>
+      <xs:element name="config-property" type="config-propertyType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              The config-property specifies administration object configuration properties.
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="common-attribute"></xs:attributeGroup>
+  </xs:complexType>
+
+  <xs:complexType name="timeoutType">
+    <xs:sequence>
+      <xs:element name="blocking-timeout-millis" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+                The blocking-timeout-millis element indicates the maximum time in
+                milliseconds to block while waiting for a connection before throwing an exception.
+                Note that this blocks only while waiting for a permit for a connection, and
+                will never throw an exception if creating a new connection takes an inordinately
+                long time. The default is 30000 (30 seconds).
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="idle-timeout-minutes" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              The idle-timeout-minutes elements indicates the maximum time in minutes
+              a connection may be idle before being closed. The actual maximum time depends
+              also on the IdleRemover scan time, which is 1/2 the smallest idle-timeout-minutes
+              of any pool.
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="allocation-retry" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              The allocation retry element indicates the number of times that allocating
+              a connection should be tried before throwing an exception. The default is
+              0.
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="allocation-retry-wait-millis" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              The allocation retry wait millis element indicates the time in milliseconds
+              to wait between retrying to allocate a connection. The default is 5000 (5
+              seconds).
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="xa-resource-timeout" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Passed to XAResource.setTransactionTimeout(). Default is zero which does not invoke the setter.
+              Specified in seconds - e.g. 5 minutes
+              <xa-resource-timeout>300</xa-resource-timeout>
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="validationType">
+    <xs:sequence>
+      <xs:element name="background-validation" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              An element to specify that connections should be validated on a background
+              thread versus being validated prior to use
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="background-validation-millis" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+               The background-validation-millis element specifies the amount of
+               time, in millis, that background validation will run.
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="use-fast-fail" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+                Whether fail a connection allocation on the first connection if it
+                is invalid (true) or keep trying until the pool is exhausted of all potential
+                connections (false) default false. e.g. <use-fast-fail>true</use-fast-fail>
+              ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resource-adaptersType">
+    <xs:sequence>
+      <xs:element name="resource-adapter" type="resource-adapterType" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies activation of a resource adapter
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="connection-definitionsType">
+    <xs:sequence>
+      <xs:element name="connection-definition" type="connection-defintionType" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies a connection definition
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="connection-defintionType">
+    <xs:sequence>
+      <xs:element name="config-property" type="config-propertyType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+             The config-property specifies managed connection factory configuration properties.
+            ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:choice>
+        <xs:element name="pool" type="poolType" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+                <![CDATA[[
+                  Specifies pooling settings
+                 ]]>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="xa-pool" type="xa-poolType" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+                <![CDATA[[
+                  Specifies xa-pooling settings
+                 ]]>
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+      <xs:element name="security" type="securityType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies security settings
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="timeout" type="timeoutType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies timeout settings
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="validation" type="validationType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Specifies validation settings
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="recovery" type="recoverType" minOccurs="0" maxOccurs="1"></xs:element>
+    </xs:sequence>
+    <xs:attribute name="use-ccm" type="xs:boolean" default="true" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[[
+            Enable cached connection manager
+           ]]>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup ref="common-attribute"></xs:attributeGroup>
+  </xs:complexType>
+
+  <xs:complexType name="poolType">
+    <xs:sequence>
+      <xs:element name="min-pool-size" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              The min-pool-size element indicates the minimum number of connections
+              a pool should hold. These are not created until a Subject is known from a
+              request for a connection. This default to 0. Ex: <min-pool-size>1</min-pool-size>
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max-pool-size" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              The max-pool-size element indicates the maximum number of connections
+              for a pool. No more than max-pool-size connections will be created in each sub-pool.
+              This defaults to 20.
+             ]]>
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="prefill" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            <![CDATA[[
+              Whether to attempt to prefill the connection pool. Default is false.
+              e.g. <prefill>false</prefill>.
+             ]]>
+          </xs:docrorPŒ@                             PŒ@    Ì‚@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EIntfCastError¬Œ@                             ¬Œ@    Ì‚@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EOSError@ @                             @    Ì‚@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ ESafecallException@ .74   ”@ H   ”@ SysUtils‹À@@ .84   ”@ H   ”@ SysUtils‹Àÿÿÿÿ   $   ¸@                             ¸@ D   °@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ 8ä@ TThreadLocalCounterÌƒÀÔéŸY  ƒÀÔéZ  ƒÀÔé“X  ƒÀÔé7Y  ƒD$Ôé¹ÞÿÿƒD$Ôé×ÞÿÿƒD$ÔéáÞÿÿÌí@ ÷@ Ž@ Í@ Õ@ Ý@ å@    RŒ{ÛLœßWàq=?Ž@ ,       ”Ž@ (Ž@                         ”Ž@ 0   ¤@ DF@ „l@ l@ XF@ LF@  l@ °C@ ìå@ $TMultiReadExclusiveWriteSynchronizer@ U‹ìS‰Ó‰ÂÁêf÷ó‹]f‰f‰[]Â SVW‹ù‹ò‹ØVW‹Ë²¡$‰@ è/?  èz½ÿÿ_^[Ã‹ÀS¡€8G ‹‰€8G ‹ÈPG ‹H‰
+‹Xº   èšŸÿÿÿÓ[Ã‹ÀS‹Ø¸   èkŸÿÿ‹€8G ‰‹ÈPG ‹‰P‰X£€8G ¡ÈPG Ç üŽ@ [Ã@ SWV…À‰Æ‰×‰ÐtA‹Vü…Òt:‰ÓèÍÉÿÿ‹?‹D3ü‰Á€€€€‰Â-{{{{1Ê€€€€-ffff!ÐÁè)Á‰L;üƒëƒãüë/^_[érÂÿÿ‹3‰Á€€€€‰Â-{{{{1Ê€€€€-ffff!ÐÁè)Á‰;ƒësÔ^_[Ã‹ÀSWV…À‰Æ‰×‰ÐtA‹Vü…Òt:‰ÓèEÉÿÿ‹?‹D3ü‰Á€€€€‰Â-[[[[1Ê€€€€-ffff!ÐÁèÁ‰L;üƒëƒãüë/^_[éêÁÿÿ‹3‰Á€€€€‰Â-[[[[1Ê€€€€-ffff!ÐÁèÁ‰;ƒësÔ^_[Ã‹À9ÐtN…ÐtM¶
+:t¶ )ÈÃS‹Xü1É+ZüSƒÑÿ!Ù+Hü)È)Ê‹3uƒÁxóX[Ã¼ÛÁëÙyó¶¶)Ð[[Ã1ÀÃ…Àt…Òu«‹@üÃ+BüÃ@ ÈÊƒñÿƒÀøƒÂøƒÁ	SC‹;urƒÁƒã)Ù.‹;u]‹\;\uSƒÁ‹;uF‹\;\u<ƒÁ~Òƒù‹;u*ƒÁƒù·f;uƒÁƒù	¶X:Zu¸   [Ã1À[Ã@ …Àu
+…Òt‹Bü÷ØÃ…Òu‹@üÃSUV‹hü‹Zü)ÝÉ!éÙ4Ê÷Ùtc·1·9ØtR8Øt,´ · <a|<zƒè €ûa|€ûzƒë )Øu5·1·8üt"ÁèÁë<a|<zƒè €ûa|€ûzƒë )ØuƒÁ|‰è^][Ã@ 9Ðt	Àt	Òt‹Hü;JüuèKÿÿÿ…Àu°Ã1ÀÃSVW‹ú‹ð‹Æ…Àtƒè‹ ‹Ø‹ÆèqÄÿÿ‹Ð‹Ç‹ËèÆÀÿÿ…Û~	S‹Pèeæÿÿ_^[ÃSVW‹ú‹ð‹Æ…Àtƒè‹ ‹Ø‹Æè9Äÿÿ‹Ð‹Ç‹ËèŽÀÿÿ…Û~	S‹Pèæÿÿ_^[ÃSVWU‹ê‹ø‹ß…Ûtƒë‹‹õ…ötƒî‹6V‹ÅèöÃÿÿPS‹ÇèíÃÿÿPjh   èLáÿÿƒè]_^[ÃSVW‹Ù‹ú‹ðSWSVjh   è+áÿÿƒè_^[ÃSVWU‹ê‹ø‹Ç…Àtƒè‹ ‹ð»   ëC;ó|€|ÿ vô;ó}
+‹Åèõ¾ÿÿëN€|7ÿ vøU‹Î+ËA‹Ó‹ÇèÔÃÿÿ]_^[Ã@ VW‹ø3À‹÷‹Î…Étƒé‹	…Éu±ë!¶€Á¿€ér€ét€Áþ€ér3Éë±€ñ„É……   „ÒtC‹Ö…Òtƒê‹ƒê|oB¾   ¶L7ÿ€é.t€Áþ€é
+r€Áù€ér€ét€Áþ€ésDFJuÕë<‹Ö…Òtƒê‹ƒê|,B¾   ¶L7ÿ€ÁÐ€é
+r€Áù€ér€ét€Áþ€ésFJuÚ°_^ÃÉu	Ày÷Øè   °-ANˆÃ¹
+   RV1Ò÷ñN€Â0€ú:r€Âˆ	ÀuêYZ)ñ)ÊvÑ°0)Öëˆ2JuúˆÃV‰æƒì1ÉR1Òè¤ÿÿÿ‰òXè”¾ÿÿƒÄ^Ã@ Éu0¹
+   ÷@   €t"ÿpÿ0‰à÷$ƒT$ ÷\$è
+   ÆFÿ-NAƒÄÃVƒìÙ|$Ù<$f$ Ù,$f‰$Ùè÷@   €t'ÿpÿ0d$ÿÿÿhÿÿÿhÿÿÿÿßl$ß,$ØÂÞÁƒÄëß(ß$ÙÁNÙøß$ÜùŠ$0<:rˆÙÁØÓ›ßàžsáÙl$ƒÄÝÃÝÂÝÁÝÀY)ñ)Êv)Ö°0Ñëˆ2JuúˆÃU‹ìV‰æƒì 1ÉP1ÒEèÿÿÿ‰òXè¢½ÿÿƒÄ ^]Â ‹Àƒú v1ÒV‰æƒì Q¹   èˆþÿÿ‰òXèx½ÿÿƒÄ ^Ã@ SVƒÄô‹Ø‹Ô‹Ãè¤¥ÿÿ‹ðƒ<$ t‰\$ÆD$T$¡ìQG 3Éèÿøÿÿ‹ÆƒÄ^[Ã@ SQ‹Ú‹Ôèm¥ÿÿƒ<$ t‹ÃZ[Ã‹ÀSVQ‹ò‹Ø‹Ô‹ÃèP¥ÿÿ‰ƒ<$ ”ÀZ^[Ã@ SVQ‹ò‹Ø‹Ô‹Ãè Ëÿÿ‰‰Vƒ<$ ”ÀZ^[Ã¡‰G èÍÿÿ…Àu)j¸‰G ¹   ‹@ è¿ÎÿÿƒÄ¡‰G º´–@ è	¼ÿÿ¡‰G èçÌÿÿ…Àu)j¸‰G ¹   ‹<@ èˆÎÿÿƒÄ¡‰G ºÄ–@ èÒ»ÿÿÃ ÿÿÿÿ   True    ÿÿÿÿ   False   U‹ìƒÄìSVWÆEÿ …Ò|fB‰Uô‹Ø‹E‹@ü‰Eð‹‰Eì‹uð…ötƒî‹6‹}ì…ÿtƒï‹?W‹Eìè¦¿ÿÿPV‹Eðèœ¿ÿÿPjh   èûÜÿÿƒè…À”À„ÀtÆEÿëƒÃÿMôu ¶Eÿ_^[‹å]Ã‹ÀU‹ìƒÄðS‹Ú‰EüUð‹Eüè  ‹Ð„ÒtÛmðØÐ—@ ›ßàž•ëIè¸þÿÿU¡‰G èÝËÿÿ‹Ð¡‰G è1ÿÿÿY‹Ð„ÒtÆë!U¡‰G èºËÿÿ‹Ð¡‰G èÿÿÿY‹Ð„ÒtÆ ‹Â[‹å]Ã     ÿÿÿÿ   0   ÿÿÿÿ   -1  SV‹ñ‹Ø„Òt,èAþÿÿ„Ût‹Æ‹‰G ‹ènºÿÿë#‹Æ‹‰G ‹è]ºÿÿ^[Ã‹Æ¶Ó‹•„8G èIºÿÿ^[Ã‹ÀSVW‹Ú‹øƒÈÿ‹óƒæƒþw?‹Óâð   ƒú@w2j h€   jj ‹Ã%ð   Áè‹…˜8G P‹µŒ8G P‹Çè3¾ÿÿPè©Ûÿÿ_^[ÃSVWQ‹ù‹ò‹Øj D$PWVSè;Ýÿÿ…ÀuÇ$ÿÿÿÿ‹$Z_^[ÃSVWQ‹ù‹ò‹Øj D$PWVSèwÝÿÿ…ÀuÇ$ÿÿÿÿ‹$Z_^[ÃU‹ìƒÄøSV‹ò‹Ø‹E‰Eø‹E‰EüVEüP‹EøPSèÝÿÿ‰Eøƒ}øÿuèÜÿÿ…ÀtÇEüÿÿÿÿ‹Eø‹Uü^[YY]Â ‹ÀS‹Ø‹Ãèv½ÿÿPèÌÛÿÿƒøÿt¨t3À[Ã°[Ã@ S‹Ø‹ÃèR½ÿÿPè¨Ûÿÿƒøÿt¨u3À[Ã°[Ã@ SVW‹ú‹ð3ÛW‹Æè'½ÿÿPèuÜÿÿ…Àuè„Ûÿÿ‹Ø‹Ã_^[ÃSVƒÄø‹ØëC P‹CPèöÚÿÿ…Àu	è]Ûÿÿ‹ðëY‹C #CuÞTC4Pè¿ÚÿÿSCPD$Pè¨Úÿÿ‹C@3ÒRP‹C<3Ò‹Ð3À$T$ƒÄ‰C‰S‹C ‰CCSL¹  èvºÿÿ3ö‹ÆYZ^[ÃSVW‹Ù‹ø÷Òƒâ‰SC P‹Çèr¼ÿÿPè`Úÿÿ‹ð‰sƒþÿt‹ÃèKÿÿÿ‹ð…öt‹Ãè6   ëè³Úÿÿ‹ð‹Æ_^[Ã@ S‹ØC P‹CPè(Úÿÿ…Àt	‹Ãèÿÿÿ[Ãè†Úÿÿ[ÃS‹Ø‹CƒøÿtPèóÙÿÿÇCÿÿÿÿ[Ã‹ÀSV‹ð‹Æ…Àtƒè‹ ‹Ø…ÛtëK‹Ó‹ÆèS<  <tòDÿ^[Ã3À^[Ã@ SVWU‹ò‹Ø‹Æ…Àtƒè‹ ‹ø‹Ãè¬»ÿÿ‹è…ÿ~)¶\>ÿ„Ût‹Ó‹Åè\  …Àt‹×‹Æèÿ;  <uOO…ÿ×‹Ç]_^[Ã‹ÀSVW‹ú‹Ø‹Ó¸t›@ è™ÿÿÿ‹ðW‹Îº   ‹Ãè¸»ÿÿ_^[Ãÿÿÿÿ   \:  SVW‹ú‹Ø‹Ó¸¬›@ èeÿÿÿ‹ðWV¹ÿÿÿ‹Ãèƒ»ÿÿ_^[Ã   ÿÿÿÿ   \:  SVW‹ú‹ð‹Ö¸ô›@ è-ÿÿÿ‹Ø…Û~€|ÿ.uW¹ÿÿÿ‹Ó‹ÆèA»ÿÿë‹Çè@¶ÿÿ_^[Ãÿÿÿÿ   .\: SVÄøþÿÿ‹ò‹ØTD$Ph  ‹Ãè¢ºÿÿPè Ùÿÿ‹ÈT$‹Æèï¶ÿÿÄ  ^[Ã‹ÀU‹ìƒÄèS‹E…Àu3ÀUðRUôRUøRUüRPèªØÿÿ‹Ø‹Eü÷mø3Ò‰Eè‰Uì‹Eô3ÒRP‹Eè‹Uìè¬Äÿÿ‹M‰‰Q‹Eð3ÒRP‹Eè‹Uìè’Äÿÿ‹M‰‰Q‹Ã[‹å]Â €8 t&‰Â÷ÚƒÀƒàþf‹ƒÀ„éuö„Ét	„íuîDÿÃDþÃ1ÀÃ‹À‰ú‰Ç¹ÿÿÿÿ2Àò®Gÿ‰×ÃV‹ð’è§“ÿÿ‹Æ^Ã@ )Â©   Pt¶ˆ…Ét@¶…Ét·f‰ƒÀùÿ   wæXÃˆXÃ@ WVS‰Æ‰×‰Ë2À…Étò®uA)Ë‰÷‰Ö‰ú‰ÙÁéó¥‰Ùƒáó¤ª‰Ð[^_Ã@ SVW‹ò‹ø‹Þ…Ûtƒë‹‹Æè7¹ÿÿ‹Ð‹Ë‹Çè¨ÿÿÿ_^[ÃSVW‹ù‹ò‹Ø‹Æè¹ÿÿ‹Ð‹Ï‹Ãè‰ÿÿÿ_^[Ã)Âu1ÀÃ¶:uv„Étr¶L:Hue„Éta¶L:HuT„ÉtP¶L:HuCƒÀ„Ét9¶:u=„Ét9¶L:Hu,„Ét(¶L:Hu„Ét¶L:Hu
+ƒÀ„ÉuŽƒèƒÀƒÀƒÀ¶ )ÈÃWVS‰×‰Æ‰Ë1À	Ét/ò®)Ë‰Ù‰×1Òó¦t!ŠFÿ<ar<zw, ŠWÿ€úar€úzw€ê )ÐtÛ[^_Ã‹Àë„Éu3ÀÃ@¶:ÑuñÃ‹ÀWVS	ÀtD	Òt@‰Ã‰×2À¹ÿÿÿÿò®÷ÑIt.‰Î‰ß¹ÿÿÿÿò®÷Ñ)ñv‰ß^ÿ‰Ö¬ò®u‰ÈW‰Ùó¦_‰ÁuíGÿë1À[^_Ã@ S‹ØƒÃ‹Ãè«ÿÿ‰ƒÀ[Ãƒè‹ ƒèÃ@ SV‹Ø…Ûu3À^[Ã‹ÃèŒýÿÿ‹ðF‹ÆèÂÿÿÿ‹Î‹Óè½ýÿÿ^[Ã‹À…Àt
+ƒè‹èzÿÿÃSVWƒÄØ‹Ù‹ò‹øƒûv»   ‹ÓJ‹Æèð7  <uK‹Ä‹Ë‹ÖèxýÿÿÆ ‹Ä‰D$ ÆD$$T$ ‹½¬8G 3ÉèCïÿÿƒÄ(_^[ÃS‹pTG ƒ9 t‹pTG ‹ÿÓ[Ã°è5ÿÿ[Ã@ S‹Ø‹Ãè^²ÿÿ[ÃU‹ìƒÄ”S3Û‰]ìSVW‰Ç‰Î1À‰EüM‰}ø1À‰Eô‰Eð‰Eì	Òt9Ît	¬<%tªJuó‰ø+Eøé#  9Îtò¬<%té^þ‰]èˆEç<-u9ÎtÜ¬è~   <:u
+‰]ô9ÎtË¬ëá‰]à»ÿÿÿÿ<.u
+9Ît¸¬èZ   ‰]Ü‰uØQRè•   Z‹]à)Ës1Û€}ç-u
+)ÊsÑ1Òó¤‡Ù)ÊsÑ1Ò° óª‡Ù)ÊsÑ1Òó¤ƒ}ð t
+REðèÿÿÿZY‹uØéGÿÿÿ1Û<*t"<0r=<9w9iÛ
+   ,0¶ÀÃ9Ît¬ëäXé0ÿÿÿ‹Eô;EÿEô‹]€|Ã ‹Ãt1Û9ÎtÜ¬Ã$ßˆÁ¸   ‹]ô;]\ÿEô‹u4Þ‹¶Vÿ$•¡@ ®¡@ a¡@ ç¡@ ®¢@ ¢@ ¢@ o¢@ a¡@ a¡@ a¡@ (¢@ S¢@ ª¢@ ö¡@ a¡@ /¢@ x¡@ 1Àè»  ‹Uè‹MØ)Ñ‹]üèÌýÿÿu·‹UÜƒú v1Ò‰Ë€éD„üòÿÿ¹   €ûX„îòÿÿ¹
+   €ûU„àòÿÿë³u§‹UÜ‰Ëƒúv1Ò€éD„Zòÿÿ¹   €ûX„Lòÿÿ¹
+   €ûU„>òÿÿézÿÿÿ€ùS…qÿÿÿ¹   Ã€ùS…bÿÿÿfƒ8v‰ÂEðèýÿÿ‹uðëJ1ÉÃ€ùS…Aÿÿÿ‰Æ¬¶Èë=¾PT@ ë¾°T@ uü€ùS…!ÿÿÿ‰ÂEìS‹]üÿÖ[‹uì‰ðë€ùS…ÿÿÿ‰Æ	öt²‹Nü;MÜwÃ‹MÜÃ€ùS…éþÿÿ‰ÆW‰Ç2À‹MÜãò®uO‰ù)ñ_Ã€ùP…Éþÿÿº   ¹   u§évñÿÿ·ë· ‰Æ³ €ùGt?³€ùEt8³€ùFt³€ùNt€ùM…Šþÿÿ³¸   ‹UÜ9Âv%º   €ùMu¶ˆG ë‹EÜº   ƒøv¸   SPRE—‰ò¶Ï‹]üèÛ  ‰Áu—ÃSPEì‹]üèø®ÿÿX[Ãèëÿÿÿ_^[[‹å]Â ‹ÀU‹ìSVW‹ù‹ò‹Ø…Ût'…öt#‹ÆèIùÿÿPW‹EP‹Î‹ÃºÿÿÿèYüÿÿÆ ‹Ãë3À_^[]Â U‹ìSVW‹ñ‹ú‹Ø…Ût'…öt#‹Æè	ùÿÿP‹EP‹EP‹Î‹Ã‹×èüÿÿÆ ‹Ãë3À_^[]Â U‹ìQ‹M‘‡Ñè   ]Â U‹ìÄðÿÿPƒÄôSVW‰Mø‰Uü‹ø»   ‹Uü‹Â…Àtƒè‹ =   },‹Â…Àtƒè‹ P‹EøP‹EP‹Mü…ôïÿÿºÿ  è›ûÿÿ‰Eôë‹Â…Àtƒè‹ ‹Ø‰]ô‹ÃH;EôMë7Û‹ÇèÏ­ÿÿ‹Ç‹Óèæ´ÿÿ‹uü…ötƒî‹6V‹EøP‹EP‹Mü‹ÓJ‹èHûÿÿ‰Eô‹ÃH;Eô~Á‹Ç‹Uôè¯´ÿÿë•ôïÿÿ‹Ç‹Môèm®ÿÿ_^[‹å]Â V1öªÛu1Òë
+	Ò}°-÷Úëätˆàª’P‰ã1Ò÷¶À8G €Â0ˆCI	Àuí	ÉéKŠª9ãuøX^ÃU‹ìƒÄÔWVS‰Eü ˆG ˆEû ˆG ˆEú¡ˆG ‰Eô ˆG ˆEó ˆG ˆEòÇEì    ¸   €ù u‹Eƒø}¸   ƒø~¸   ‰EP¸'  €}r‹EPEÔè]  ‹}ü·EÔ-ÿ  ƒøs‰Áèp   ´Iè¥@ uì¹   ó¤ë-u×¶]€ût€ûw	¿EÔ;E~³ Ô¥@ ]ì‹]ìÿÓ‰ø+Eü[^_éñ  ¦@ ]¦@ ”¦@ ”¦@ þ¦@ INFNAN¬Àu°0NÃ€}Ö t°-ªÃèñÿÿÿ¿MÔ1Ò;Mƒùý|	É°0ª€> t:ŠEûª÷Ù°0óªë¹   B¬Àtªâø¬ÀtˆÄŠEûf«¬Àtªëø°0óª	Òt1ÀëÃè•ÿÿÿè‡ÿÿÿŠeûf«‹MIèyÿÿÿªâø´+‹Mƒùv1É°EŠ]×¿UÔJè!þÿÿÃè^ÿÿÿ‹Uƒúrº   ¿MÔ	É°0ªë*1Û€}t
+‰ÈH³öóˆãCè$ÿÿÿªItKuôŠEú„Àtíª³ëè	ÒtŠEû„Àtªã	°0ªJtAuùèõþÿÿªJu÷Ã1ÛŠ]ó¹   €}Ö tŠ]ò¹  8ËvˆË ëœ›a§@ ]ì¹   Š<@tQS<$t<*t
+ªëè   ëèMÿÿÿ[YCâÜÃV‹uô…öt‹Nüó¤^Ã$*@@@*$@@@$ *@@* $@@($*)@-$*@@$-*@@$*-@@(*$)@-*$@@*-$@@*$-@@-* $@-$ *@* $-@$ *-@$ -*@*- $@($ *)(* $)‹å]Â U‹ìƒÄàWVS‰Ã‰ÖÇEü    €ù t
+è1  é   è   éö  f‹F‰Â%ÿ  t=ÿ  u"f÷F €tƒ> u	~   €t@1ÒÆC éÍ   Û.-ÿ?  iÀM  Áø@‰Eø¸   +EøÙáS‹]üèz–ÿÿ[Ùü‹}üÛ¯´8G ØÙ›Ý}ö›f÷Eö At	Ú·À8G ÿEøßuè{º	   ›ŠD*çˆÄÀè€äf00f«Juë2Àª‹}ø}y1Àéwÿÿÿ;}r‹}ƒÿs'€|;5r%ÆD; OxþD;€|;9wíëfÇC1 ÿEøë¿   ÆD; Ox€|;0tñf‹V‹EøfÁêf‰ˆSÃ1Òëî
+   d   è  '  ‹‹V‰Á	Ñ„·   	Òy÷Ú÷ØƒÚ 1É‹}	ÿ}1ÿƒÿ|¿   A-  d§Ú³¶àsòI  d§Ò³¶à‰Eà‰Uäßmà‰ú¸   )Ðt
+‹}üÚ´‡©@ ßuè{›	Éu¹	   ŠD)çˆÄÀèuˆà$uIuìë9ˆÈ0ª¹	   ŠD)çˆÄÀè0ªˆà$0ªIuê‰øL)ÈÆ O€?0t÷‹VÁêë1À1ÒˆCf‰ˆSÃ[^_‹å]Â U‹ìƒÄôWVS‰Æ‰×ÇEü     ˆG ˆEû‰Ë›Ù}ø›ÛâÙ-Ä8G Ùîè…   Š>€ÿ+t€ÿ-uF‰ñè|   1ÒŠ:EûuFèm   ÷Ú9ñtOŠ$ß<Eu
+FRèt   XÂèE   €> u3‰Ð€ûuƒÀS‹]üèN”ÿÿ[€ÿ-uÙà€û tß?ëÛ?›ßàf©	 u°ëÝØ1À›ÛâÙmø›ëV¬Àt< t÷NÃ1À1Ò¬,:
+sÚÀ8G ‰EôÚEôBëêNÃ1À1ÒŠ€ù+t€ù-uFŠ,:
+sFkÒ
+Âúô  rê€ù-u÷ÚÃ[^_‹å]ÃU‹ìƒÄÀS‹Øj jj UEÀ3ÉèÐùÿÿ‹ÈUÀ‹Ãèä§ÿÿ[‹å]Â U‹ìƒÄÀS‹Øj j j UEÀ±è ùÿÿ‹ÈUÀ‹Ãè´§ÿÿ[‹å]Â SV‹ò‹Ø‹Ãè?«ÿÿ‹Ö3Éèvþÿÿ^[Ã@ SVƒÄô‹ò‹Ø‹Ãè «ÿÿ‹Ô3ÉèWþÿÿ„ÀtÛ,$Ý›ƒÄ^[Ã@ SVƒÄô‹ò‹Ø‹Ãèôªÿÿ‹Ô3Éè+þÿÿ„ÀtÛ,$Ù›ƒÄ^[Ã@ SV‹ò‹Ø‹ÃèËªÿÿ‹Ö±èþÿÿ^[Ã@ U‹ìS1Û‰ÁÝEØ‹È8G ƒìß<$›XZ	Òy÷Ú÷ØƒÚ ÷³Ì8G ÷Øë÷³Ì8G Z•
+ ‰‰A[]Â U‹ìƒÄøV‹uÆEÿ fƒøsMfƒú<sGfƒù<sAfþès:·ÀiÀ€î6 ·ÒiÒ`ê  Â·ÑiÒè  Â·ÖÂ‰EøÛEøØ5¬¬@ ‹EÝ›ÆEÿ¶Eÿ^YY]Â €Ë¤LU‹ìƒÄôSVW‹ù‹ò‹ØEüPÿuÿuEôè+ÿÿÿ‹EôMþfº`êèÜáÿÿV‹Ë·Eþfº< èÌáÿÿ‹EP‹Ï·Eüfºèè¹áÿÿ_^[‹å]Â SV‹È·Áƒà…Àu!·Ù‹Ã¾d   3Ò÷ö…Òu‹Ã¹  3Ò÷ñ…Òt3À^[Ã°^[Ã@ U‹ìƒÄøSVW‹Ù‹úf‰EþÆEý ·Eþè¦ÿÿÿƒà@4Å(8G fƒ}þ‚†   f}þ'w~fƒÿrxfƒÿwrfƒûrl·Çf;\Fþwb·ÇH…À~¹   f\NþAHu÷·MþI‹Á¾d   ™÷þiñm  ‹Ñ…ÒyƒÂÁúò+ð‹Á¹  ™÷ùð·ÃðîZ•
+ ‰uøÛEø‹EÝ›ÆEý¶Eý_^[YY]Â @ U‹ìƒÄèSV‰Mô‰Uø‰Eü‹]ÿuÿuEèèÆýÿÿ‹Mì…É$‹EüfÇ   ‹EøfÇ   ‹EôfÇ   fÇ  3Òéò   ‹Á¾   ™÷þBf‰If» ù±: |é±: fÃù±: }íEòPEðfº¬Ž‘èàÿÿfƒ}ðu
+fÿMðfEò¬ŽfkEðdfØEòPMð·Eòfºµèïßÿÿ·EðÀÀfØEòPMð·EòfºmèÐßÿÿfƒ}ðu
+fÿMðfEòmf]ð‹Ãèþÿÿ‹Ð¶Â@4Å(8G f¸ ·È·LNþf‰Mð·Mòf;Mðr·Mðf)Mò@ëß‹Müf‰‹Møf‰·Eò@‹Môf‰‹Â^[‹å]Â @ U‹ìQV‹ðÿuÿuEþP‹Æèœþÿÿ^Y]Â ‹ÀU‹ìƒÄøÿuÿuEøèhüÿÿ‹Eü¹   ™÷ù‹Â@YY]Â ƒÄðTè{Åÿÿ·$ƒÄÃ@ U‹ìS‹M»   +™üþÿÿ;Ó}‹Ú…Ût‹U‹’üþÿÿ‹M” ÿÿÿ‹Ëèª€ÿÿ‹E˜üþÿÿ[]Ã‹ÀU‹ì‹Ð…Òtƒê‹‹MQè¥ÿÿÿY]Ã‹ÀU‹ìƒÄàSV‹ò‹Ø‹EPj‰uàÆEä ‰]èÆEì EàPj¹Ð8G Eðº   èxïÿÿ‹ÐEðè^ÿÿÿY^[‹å]Ã@ U‹ìS‹EƒÀü‹ëÿ ‹¶	‹]:Kûtñ‹ +Â@‹U‰Bô[]ÃU‹ì‹E€xí u*‹E‹@ÿpÿp‹EHî‹EPð‹EƒÀòèþÿÿ‹EÆ@í]ÃU‹ì‹E€xã u1‹E‹@ÿpÿp‹EƒÀäP‹EHæ‹EPè‹EƒÀêè®ûÿÿ‹EÆ@ã]ÃU‹ìÄäþÿÿSV3É‰äþÿÿ‰Mü‹Ú‹ð3ÀUhn²@ dÿ0d‰ ‹Ãèí ÿÿ‹E·@òf‰Eì‹E·@ðf‰Eî‹E·@îf‰EòEüº„²@ èW¡ÿÿh   …ìþÿÿP‹Eüè;¥ÿÿPEìPjèÛÃÿÿPèmÃÿÿ…À„¶   ‹Ã•ìþÿÿ¹   èï¢ÿÿN…   ¡ÌˆG ƒèt&ƒè…Š   S‹º   è<'  ‹È‹º   èB¥ÿÿëmƒ=ÐˆG ud‹‰…èþÿÿ‹µèþÿÿ…ötƒî‹6‹‹Öèc%  ƒøu?‹º   èn&  ‹ð…ìþÿÿðN…äþÿÿ‹Öèî¡ÿÿ‹…äþÿÿº   èÊ&  ‹È‹Ã‹ÖèË ÿÿ3ÀZYYd‰hu²@ …äþÿÿèÃŸÿÿEüè»ŸÿÿÃé™ÿÿëå^[‹å]Ã ÿÿÿÿ   gg  U‹ìÄèþÿÿSV3É‰Mü‹Ú‹ð3ÀUhv³@ dÿ0d‰ ‹ÃèwŸÿÿ‹E·@òf‰Eì‹E·@ðf‰Eî‹E·@îf‰EòƒþEüºŒ³@ èÜŸÿÿëEüº˜³@ èÍŸÿÿh   …ìþÿÿP‹Eüè±£ÿÿPEìPjèQÂÿÿPèãÁÿÿ…ÀtC‹Ã•ìþÿÿ¹   èi¡ÿÿNu.‹€80u'‹‰…èþÿÿ‹µèþÿÿ…ötƒî‹6S‹ÎI‹º   èÀ£ÿÿ3ÀZYYd‰h}³@ Eüè³žÿÿÃé˜ÿÿëð^[‹å]Ã ÿÿÿÿ   yy  ÿÿÿÿ   yyyy    U‹ìƒÄÔSVW3Ò‰UÔ‰UØ‰Eü}ü3ÀUh$»@ dÿ0d‰ ƒ? „;  ‹Eƒ¸øþÿÿ+  ‹Eÿ€øþÿÿÆEâ ÆEí ÆEã ÆEá éù  ‹¶ ˆEû¶Eû¶À£X8G s'‹EP‹è]%  ‹Ð‹è”ûÿÿY‹èl%  ‰ÆEâ éº  ‹èZ%  ‰¶]û‹ÃŸ,s€ë ‹Ã¿,s€ûMu€}âHu³Nˆ]â¶ÃƒÀÞƒø8‡i  ¶€ˆ´@ ÿ$…Á´@                                      	    
+ãº@ µ@ Pµ@ }µ@ ªµ@ ¶@ ¼¶@ À·@ ñ·@ "¸@ W¸@ ˆ¸@ õ¹@ Sº@ vº@ •º@ UèaûÿÿYUè†ûÿÿYƒ}ô#‹EP·Eò¹d   3Ò÷ñ‹Âº   èêúÿÿYé½  ‹EP·Eòº   èÒúÿÿYé¥  UèûÿÿYUè7ûÿÿY‹EPUUØ‹EôèžûÿÿY‹EØè‰úÿÿYéx  UèåúÿÿYUè
+ûÿÿY‹EPUUÔ‹EôèíüÿÿY‹EÔè\úÿÿYéK  Uè¸úÿÿYUèÝúÿÿY‹EôHƒèrtë0‹EP·Eð‹UôèGúÿÿYé  ‹EP·Eð‹…,ˆG èúÿÿYé   ‹EP·Eð‹…\ˆG è÷ùÿÿYéæ  UèSúÿÿY‹EôHƒèr
+t%HtIHtmëUèeúÿÿY‹EP·Eî‹UôèÜùÿÿYé¯  ‹EP‹Eÿpÿpè(ùÿÿ·À‹…ŒˆG è™ùÿÿYéˆ  ‹EP‹Eÿpÿpèùÿÿ·À‹…¨ˆG èrùÿÿYéa  ‹EP¡ˆG èþüÿÿYéM  ‹EP¡ˆG èêüÿÿYé9  Uè¦ùÿÿYUèúÿÿYÆEà ‹7é–   ¶¶À£X8G s‹Æè±"  ‹ðë|¶ƒøHt{ƒè"tcƒèt^ƒètë`ƒèatƒèt`ëT€}à uNº4»@ ¹   ‹Æèçÿÿ…Àt*º<»@ ¹   ‹Æèúæÿÿ…Àtº@»@ ¹   ‹Æèåæÿÿ…ÀuÆEáë¶Eà4ˆEàF€> …aÿÿÿ·Eêf‰EÞ€}á tfƒ}Þ ufÇEÞ ëfƒ}ÞvfƒmÞƒ}ô~ÇEô   ‹EP·EÞ‹UôèbøÿÿYé5  Uè¢øÿÿYUèÿøÿÿYƒ}ô~ÇEô   ‹EP·Eè‹Uôè1øÿÿYé  UèqøÿÿYUèÎøÿÿYƒ}ô~ÇEô   ‹EP·Eæ‹Uôè øÿÿYéÓ  Uè@øÿÿYƒ}ôu‹EP¡(ˆG ècûÿÿYé²  ‹EP¡,ˆG èOûÿÿYéž  UèøÿÿYUèhøÿÿYƒ}ô~ÇEô   ‹EP·Eä‹Uôèš÷ÿÿYém  Uè>øÿÿY‹7Nº4»@ ¹   ‹Æè™åÿÿ…Àu'fƒ}êrƒÆ‹EPº   ‹ÆèûöÿÿYƒÆEáé'  º<»@ ¹   ‹Æè]åÿÿ…Àu'fƒ}êrƒÆ‹EPº   ‹Æè¿öÿÿYƒÆEáéë  º@»@ ¹   ‹Æè!åÿÿ…Àu3fƒ}ês‹EP¡ ˆG èÌöÿÿYë‹EP¡$ˆG è»öÿÿYƒÆEáé£  ºH»@ ¹   ‹ÆèÙäÿÿ…Àu1Uè'÷ÿÿY‹EP‹Eÿpÿpè öÿÿ·À‹…¨ˆG èqöÿÿYƒé]  ºP»@ ¹   ‹Æè“äÿÿ…Àu1UèáöÿÿY‹EP‹Eÿpÿpèºõÿÿ·À‹…ŒˆG è+öÿÿYƒé  ‹EPEûº   èÍõÿÿYé   UèmöÿÿY‹EP¡ˆG è–ùÿÿYUè»öÿÿYfƒ}ê ufƒ}è ufƒ}æ „Ê   ‹EP¸T»@ º   è~õÿÿY‹EP¡,ˆG èSùÿÿYé¢   €=ˆG  „•   ‹EP¸ˆG º   èIõÿÿYë€=ˆG  tv‹EP¸ˆG º   è*õÿÿYë`‹7ë‹¶ ¶À£X8G s‹èë  ‰ëÿ‹€8 t
+‹¶ :EûuÑ‹EP‹+Ö‹ÆèåôÿÿY‹€8 tÿë‹EPEûº   èÈôÿÿY‹€8 …üøÿÿ‹Eÿˆøþÿÿ3ÀZYYd‰h+»@ EÔº   è)—ÿÿÃégÿÿëë_^[‹å]Ã  AM/PM   A/P AMPM    AAAA    AAA     U‹ìÄøþÿÿSV‹Ú‹ð3À‰…üþÿÿ3À‰…øþÿÿ…ÛtU‹ÃèøÿÿYëU¸°»@ èøÿÿY• ÿÿÿ‹Æ‹üþÿÿès—ÿÿ^[‹å]Â    C   SVW‹ú‹ð‹ëC‹Æè!™ÿÿ;Ø€|ÿ tí‰_^[ÃU‹ìƒÄôSVW‰Mø‰Uü‹øÆE÷ ‹EÆ  ‹Uü‹Çè·ÿÿÿ‹]ü‹3öë‹ÆÀ€¶Tÿfƒê0fÂ‹ðC‹ÇèÅ˜ÿÿ;Ø¶DÿÐ,
+sfþèrÍ‹Eü;~‹Ã‹Uü‹*Â‹Uˆ‹Eü‰‹Eøf‰0ÆE÷¶E÷_^[‹å]Â ‹ÀU‹ìƒÄìSVW3Û‰]ì‹Ù‰Uø‰Eü3ÀUh2½@ dÿ0d‰ ÆE÷ …Û„€   ‹Uø‹Eüèÿÿÿ‹ó…ötƒî‹6EìP‹Uø‹‹Î‹Eüè[šÿÿ‹Eì‰Eð‹ó…ötƒî‹6‹}ð…ÿtƒï‹?W‹EðèÍ™ÿÿPV‹ÃèÄ™ÿÿPjh   è#·ÿÿƒè…Àu‹Ã…Àtƒè‹ ‹UøÆE÷3ÀZYYd‰h9½@ Eìè÷”ÿÿÃéYŽÿÿëð¶E÷_^[‹å]ÃSVWQˆ$‹ú‹ð3Û‹×‹ÆèZþÿÿ‹Æ…Àtƒè‹ ;|‹¶Dÿ:$uÿ³‹ÃZ_^[ÃSVW‹ð3Û¿   ë*¶D>ÿ$ß,DtþÈt
+,t,të³ë³ë3Ûë³ëG‹Æè)—ÿÿ;ø~Ë3Û‹Ã_^[ÃSV‹Ú‹ðë"‹¶Dÿ¶À£X8G s‹‹Æèì  ‰ëÿ‹Æèë–ÿÿ;|‹¶DÿÐ,
+sÆ^[Ã@ SVWUQ‹è3À‰$¿   »ØˆG ¾ôˆG ƒ; t)‹Åè}˜ÿÿP‹èu˜ÿÿZè+  …Àt‹‰$ë	ƒÆƒÃOuÒ‹$Z]_^[Ã‹ÀU‹ìS‹Øƒ=ÌˆG u:ƒûc$è'ñÿÿ·È‹E‹@ü™3Â+ÂÈ‹Á¹d   ™÷ùkÀdØ‹Eƒxü ~‹E÷Xüë‹EÿHü‹E‹@üÃ[]Ã‹ÀU‹ìƒÄØSVW3Û‰]Ø‰]Ü‰]à‰]ø‰Mô‹Ú‹ð3ÀUhæÁ@ dÿ0d‰ 3ÿfÇEê  fÇEè  ÆEä ÆEó ¡ˆG èpþÿÿˆEò3À‰Eü¡ˆG €8gu4‹Ó‹Æè¡þÿÿEàP‹Iº   ‹Æèâ—ÿÿ‹EàUøè·Óÿÿ‹EøèÃþÿÿ‰Eüë‹ˆG ¸ Â@ èB  …À~¡ôˆG ‰EüEçPMð‹Ó‹ÆèVüÿÿ„À„9  ‹Ó¶ˆG ‹Æèªýÿÿ„À„!  EæPMî‹Ó‹Æè&üÿÿ„À„	  ‹Ó¶ˆG ‹Æèzýÿÿ„À„Ò   EåPMì‹Ó‹Æèöûÿÿ„À„Ù  ¶Eò,rt#þÈt<ëU·}ì¶EåˆEä·Eðf‰Eê·Eîf‰Eèë8·}ì¶EåˆEä·Eîf‰Eê·Eðf‰Eèë·}ð¶EçˆEä·Eîf‰Eê·Eìf‰Eèƒ}ü ~U·Çè
+þÿÿY‹øëp€}äwjè:ïÿÿ·È·$8G +È‹ÁQ¹d   ™÷ùYfkÀdføfƒ=$8G  v<·Ç;È~5fƒÇdë/èÿîÿÿ‹ø€}òu·Eðf‰Eè·Eîf‰Eêë·Eðf‰Eê·Eîf‰Eè‹Ó¶ˆG ‹Æèaüÿÿ‹Ó‹ÆèÈúÿÿ€=ÔˆG  „´   ‹ˆG ¸Â@ èû–ÿÿ…À„œ   ¡(ˆG ¶ Ð,
+s‹Ó‹Æè¤üÿÿé€   ëÿ‹Æè°“ÿÿ;|	‹€|ÿ uê‹Ó‹Æèfúÿÿ‹Æè““ÿÿ;|TEÜP¡ ˆG è“ÿÿ‹È‹‹Æè®•ÿÿ‹UÜ¡ ˆG èÑÿÿ…Àt*EØP¡$ˆG èW“ÿÿ‹È‹‹Æè„•ÿÿ‹UØ¡$ˆG èóÐÿÿ…Àu„‹EôP·Mè·Uê‹ÇèˆëÿÿˆEó3ÀZYYd‰híÁ@ EØº   èoÿÿEøèCÿÿÃé¥‰ÿÿëã¶Eó_^[‹å]Ãÿÿÿÿ   e   ÿÿÿÿ   ddd SVWUƒÄð‰$‹ò‹è3ÛƒÏÿ‹Ö‹ ˆG ‹Åè:úÿÿ„Àu‹Ö¹øÃ@ ‹Åè(úÿÿ„Àt3ÿë*‹Ö‹$ˆG ‹Åèúÿÿ„Àu‹Ö¹Ä@ ‹Åèÿùÿÿ„Àt¿   …ÿ|	‹Ö‹Åè1ùÿÿD$PL$‹Ö‹ÅèCùÿÿ„À„H  fÇD$  fÇD$  fÇD$
+  ‹Ö¶ˆG ‹Åè‚úÿÿ„ÀtvD$PL$
+‹Ö‹Åè ùÿÿ„À„  ‹Ö¶ˆG ‹ÅèTúÿÿ„ÀtHD$PL$‹Ö‹ÅèÒøÿÿ„À„×   ‹Ö¶ˆG ‹Åè&úÿÿ„ÀtD$PL$‹Ö‹Åè¤øÿÿ„À„©   …ÿ}S‹Ö‹ ˆG ‹Åèùÿÿ„Àu‹Ö¹øÃ@ ‹Åèùÿÿ„Àt3ÿë*‹Ö‹$ˆG ‹Åèôøÿÿ„Àu‹Ö¹Ä@ ‹Åèâøÿÿ„Àt¿   …ÿ|$fƒ|$ tFfƒ|$w>fƒ|$ufÇD$  f|$‹Ö‹Åèð÷ÿÿ·D$
+P‹D$P·L$·T$·D$è]èÿÿ‹Ø‹ÃƒÄ]_^[Ã ÿÿÿÿ   AM  ÿÿÿÿ   PM  SVQ‹ò‹ØÇ$   ‹Î‹Ô‹Ãè£úÿÿ„Àt‹Ã…Àtƒè‹ ;$œÀë3ÀZ^[Ã‹ÀSVQ‹ò‹ØÇ$   ‹Î‹Ô‹Ãè·ýÿÿ„Àt‹Ã…Àtƒè‹ ;$œÀë3ÀZ^[Ã‹ÀSVWƒÄè‹ú‹ð³Ç$   3À‰D$‰D$L$‹Ô‹Æè"úÿÿ„Àu°ë#‹Æ…Àtƒè‹ ;$}°ëL$‹Ô‹ÆèEýÿÿ4„Àt‹×‹Æèfÿÿÿ‹Øë(ÝD$ØÅ@ ›ßàžrÝD$ÜD$Ý›ëÝD$Üd$Ý›‹ÃƒÄ_^[Ã     SÄ ÿÿÿ‹Új h   T$Rj Pj h 2  èŒ¯ÿÿëH…À~¶Tÿ€ê!rñ€êtì‹Ô‹Ë‘èÀÿÿÄ   [ÃU‹ìÄ ÿÿÿSV‹ñ‹]h    ÿÿÿQRPè±¯ÿÿ…À~‹ÈI• ÿÿÿ‹Ãèÿÿë	‹Ã‹ÖèÚŒÿÿ^[‹å]Â ‹ÀSVWQ‹Ù‹ò‹øjD$PVWèp¯ÿÿ…À~¶$ë‹ÃZ_^[Ã@ U‹ìQSVW‰Mü‹ú‹ð‹]S‹E‹@ü3É‹Öègÿÿÿƒ; u‹Eü‹¸‹ÓèÙªÿÿ_^[Y]Â U‹ì3ÉQQQQQQSVW3ÀUh'Ç@ dÿ0d‰ è/¯ÿÿ‰Eü»   ¾0ˆG ¿`ˆG UjEôP¹Ô8G ‹ÓJCDHèyÿÿÿY‹Uô‹ÆèŒÿÿUjEðP¹9G ‹ÓJC8HèVÿÿÿY‹Uð‹Çèï‹ÿÿCƒÇƒÆƒûu®»   ¾ˆG ¿¬ˆG C¹   ™÷ù‰UøUjEìP¹49G ‹ÓJ‹EøƒÀ1èÿÿÿY‹Uì‹Æè¡‹ÿÿUjEèP¹P9G ‹ÓJ‹EøƒÀ*èãþÿÿY‹Uè‹Çè|‹ÿÿCƒÇƒÆƒûuœ3ÀZYYd‰h.Ç@ Eèº   è&‹ÿÿÃéd„ÿÿëë_^[‹å]Ã@ U‹ìSV3ö»   ëƒûtCƒ<ÔˆG  uðÔˆG ‹Uè»Œÿÿ¾   ‹Æ^[]Â ‹ÀU‹ìj SV3ÀUhÙÇ@ dÿ0d‰ 3ö»   ëƒût,Cƒ<ðˆG ÿuðEü‹UèsŒÿÿ‹Eü3Òè-Îÿÿ‰ðˆG ¾   3ÀZYYd‰hàÇ@ EüèPŠÿÿÃé²ƒÿÿëð‹Æ^[Y]Â @ U‹ìj V3ÀUhƒÈ@ dÿ0d‰ EüPè[­ÿÿ¹˜È@ º  èHýÿÿ‹Eüº   è¿Íÿÿ‹ð‹ÆƒÀýƒès<jVè+­ÿÿPh8Ç@ èH¬ÿÿº   ¸ôˆG Ç ÿÿÿÿƒÀJuôjVè­ÿÿPhtÇ@ è¬ÿÿ3ÀZYYd‰hŠÈ@ Eüè¦‰ÿÿÃéƒÿÿëð^Y]Ã  ÿÿÿÿ   1   U‹ì3ÉQQQQQSVW‹ú‹ð3ÀUhlÊ@ dÿ0d‰ »   ‹Çèa‰ÿÿEøPè”¬ÿÿ¹„Ê@ º	  èüÿÿ‹Eøº   èøÌÿÿƒÀýƒè‚J  ¡ÌˆG ƒètƒÀóƒèr3Àë°„Àt7ë%¶Dÿ,Gt, tEô¶TÿèàŠÿÿ‹Uô‹Çèº‹ÿÿC‹Æè¦‹ÿÿ;Ø~Ðé  ‹Ç‹Öè(‰ÿÿéø   ¶Dÿ¶À£X8G s.‹Ó‹Æè1  ‰EüEðP‹Mü‹Ó‹Æèšÿÿ‹Uð‹Çèd‹ÿÿ]üéª   ºˆÊ@ Dÿ¹   è‘Ôÿÿ…Àu‹Çº”Ê@ è9‹ÿÿCé€   º˜Ê@ Dÿ¹   èhÔÿÿ…Àu‹Çº¨Ê@ è‹ÿÿƒÃëXº°Ê@ Dÿ¹   è@Ôÿÿ…Àu‹Çº¼Ê@ èèŠÿÿCë2¶Dÿ,Yt, u‹ÇºÈÊ@ èÌŠÿÿëEì¶TÿèÙ‰ÿÿ‹Uì‹Çè³ŠÿÿC‹ÆèŸŠÿÿ;ØŽÿÿÿ3ÀZYYd‰hsÊ@ Eìº   èá‡ÿÿÃéÿÿëë_^[‹å]Ã  ÿÿÿÿ   1   gg  ÿÿÿÿ   ggg yyyy    ÿÿÿÿ   eeee    yy  ÿÿÿÿ   ee  ÿÿÿÿ   e   …Àt-   Ã‹ÀU‹ìÄ¨ûÿÿSVW‰Mü‹Ú‹ðj…ÐüÿÿPSèB«ÿÿ½àüÿÿ   uh  …îýÿÿP‹…ÔüÿÿPè&ªÿÿ…Àu#h  …îýÿÿP¡ø‡G Pèªÿÿ‹ÃèŒÿÿÿ‰Eøë	+Ôüÿÿ‰]ø…îýÿÿ²\è¹  ‹ÐB…óþÿÿ¹  èÆÑÿÿ»XÌ@ ¿XÌ@ ‹Æ‹Ì‚@ èzÿÿ„Àt!‹Fè'‹ÿÿ‹Ø‹ÃèÑÿÿ…Àt€|ÿ.t¿\Ì@ h   …îüÿÿP¡xTG ‹@P¡ø‡G è?šÿÿPè%°ÿÿ•¨ûÿÿ‹è wÿÿ…¨ûÿÿ‰…¨üÿÿÆ…¬üÿÿ…óþÿÿ‰…°üÿÿÆ…´üÿÿ‹Eø‰…¸üÿÿÆ…¼üÿÿ‰ÀüÿÿÆ…Äüÿÿ‰½ÈüÿÿÆ…Ìüÿÿ…¨üÿÿPjîüÿÿ‹U‹Eüè>×ÿÿ‹EüèZÐÿÿ_^[‹å]Â      .   Ä¼ûÿÿh   L$Hèdþÿÿ¡œSG €8 t^¡œQG èüiÿÿèocÿÿD$DPD$HPè ¬ÿÿj D$PD$LèüÏÿÿPD$PPjôè£¨ÿÿPè©ÿÿj D$Pjh$Í@ jôèˆ¨ÿÿPèr©ÿÿë6j@D$P¡DQG ‹@P¡ø‡G è™ÿÿPèø®ÿÿh   D$PD$LPj èú®ÿÿÄD  Ã   ÿÿÿÿ   
+  SVW„ÒtƒÄðèéyÿÿ‹ñ‹Ú‹øG‹Öè5…ÿÿ‹Ç„Ûtè&zÿÿd    ƒÄ‹Ç_^[Ã‹ÀU‹ìj SVW„ÒtƒÄðè¨yÿÿ‹ñ‹Ú‹ø3ÀUh¾Í@ dÿ0d‰ EüP‹U‹M‹Æè'Öÿÿ‹UüGèÔ„ÿÿ3ÀZYYd‰hÅÍ@ Eüèk„ÿÿÃéÍ}ÿÿëð‹Ç„Ûtè¨yÿÿd    ƒÄ‹Ç_^[Y]Â SVW„ÒtƒÄðè-yÿÿ‹ñ‹Ú‹øW‹Æèá¢ÿÿ‹Ç„Ûtèjyÿÿd    ƒÄ‹Ç_^[Ã‹ÀU‹ìj j SVW„ÒtƒÄðèêxÿÿ‹ñ‹Ú‹ø3ÀUhŒÎ@ dÿ0d‰ EüPUø‹ÆèŒ¢ÿÿ‹Eø‹U‹Mè^Õÿÿ‹UüGè„ÿÿ3ÀZYYd‰h“Î@ Eøº   èÁƒÿÿÃéÿ|ÿÿëë‹Ç„ÛtèÚxÿÿd    ƒÄ‹Ç_^[YY]Â U‹ìSVW„ÒtƒÄðèZxÿÿ‹ñ‹Ú‹øG‹Öè¦ƒÿÿ‹E‰G‹Ç„Ûtè‘xÿÿd    ƒÄ‹Ç_^[]Â ‹À€x tè©tÿÿÃÏ@ 	TErrorRec      ”@    SVƒÄø3ÛèHaÿÿ‹ðëCƒû	;4Ýl9G uñƒû‹Ýp9G ²¡@„@ èÉýÿÿë‰4$ÆD$ Tj ‹@QG ²¡@„@ è¢þÿÿ‰pYZ^[Ã‹ÀŒÏ@ 
+TExceptRec      ”@    S‹Ú‹ÐþÊtþÊtJ€êrë*‹‰G ë)‹ ‰G ë!¶ÀÅŒ9G ‹H‹ ²èEýÿÿ‹Ðëè<ÿÿÿ‹ÐS‹Âéz|ÿÿ[ÃU‹ìƒÄàSVW3Û‰]à‰]ü‹ù‹ò‹Ø3ÀUh”Ð@ dÿ0d‰ …ÛtEü‹Óè•‚ÿÿëUü¡pSG èª ÿÿ‹Eü‰EäÆEè‰uìÆEð‰}ôÆEø EäPjUà¡ÜSG è ÿÿ‹Mà²¡H‹@ èðüÿÿ‹Ø3ÀZYYd‰h›Ð@ EàèÿÿEüè•ÿÿÃé÷zÿÿëè‹Ã_^[‹å]Ã‰Ì‰$‹m é¿{ÿÿÃ‹ÀU‹ìè<ÿÿÿMƒÁ‹UèÚÿÿÿ]Â ‹À‹hQG ²¡¨‹@ èýÿÿè‰{ÿÿÃ‹ =’  À,tY=Ž  ÀtS-  ÀtU-‡   t<HtHëUqÿÿ?ƒèr3t7ëG=–  Àt5-“  Àt(HtHtë/-ý  Àt%ƒè=të!°Ã°Ã°Ã°Ã°Ã°Ã°	Ã°Ã°Ã°Ã°Ã°ÃS‹Ø‹Ãèvÿÿÿ¶À‹ÅŒ9G [Ã‹ÀU‹ìÄþÿÿSV3À‰…þÿÿ‰…´þÿÿ‰…¬þÿÿ‰…°þÿÿ‰Eü3ÀUh;Ó@ dÿ0d‰ ‹E‹Xüƒ{ uUü¡ÀTG èŸÿÿëUü¡8SG èŸÿÿ‹sjEàP‹CPèL¤ÿÿ}ð   …³   h  …ÛþÿÿP‹EäPè2£ÿÿ…À„–   ‹C‰…¸þÿÿÆ…¼þÿÿ…°þÿÿ•Ûþÿÿ¹  èX‚ÿÿ‹…°þÿÿ•´þÿÿè'Éÿÿ‹…´þÿÿ‰…ÀþÿÿÆ…Äþÿÿ‹Eü‰…ÈþÿÿÆ…Ìþÿÿ‰µÐþÿÿÆ…Ôþÿÿ…¸þÿÿPj•¬þÿÿ¡¼SG èJžÿÿ‹¬þÿÿ²¡€‰@ è¸úÿÿ‹ØëZ‹C‰…”þÿÿÆ…˜þÿÿ‹Eü‰…œþÿÿÆ… þÿÿ‰µ¤þÿÿÆ…¨þÿÿ…”þÿÿPj•þÿÿ¡DSG èîÿÿ‹þÿÿ²¡€‰@ è\úÿÿ‹Ø3ÀZYYd‰hBÓ@ …þÿÿèÿÿ…¬þÿÿº   èÿÿEüèî~ÿÿÃéPxÿÿëÕ‹Ã^[‹å]Ã‹ÀU‹ìƒÄðS3Ò‰Uð‰Eü3ÀUhÔ@ dÿ0d‰ ‹Eüèwýÿÿ¶À‹ÐƒÂýƒêrtJƒê
+s"ÅŒ9G ‹H‹ ²èùÿÿ‹Øë;UèÝýÿÿY‹Øë0‹Eü‹ ‰EôÆEø EôPj Uð¡´PG èÿÿ‹Mð²¡ð„@ èŽùÿÿ‹Ø‹Ã‹˜„@ è£qÿÿ„Àt‹Eü‰C3ÀZYYd‰hÔ@ Eðè$~ÿÿÃé†wÿÿëð‹Ã[‹å]ÃèGøÿÿ¸   èí}ÿÿÃ‹HQG ²¡äƒ@ è®ùÿÿ£‰G ‹ SG ²¡lˆ@ è—ùÿÿ£ ‰G ¡ÌPG Ç ¨Ï@ ¡ÐQG Ç Ô@ ¡0QG ‹Ì‚@ ‰¡´QG Ç hÑ@ ¡ØQG Ç LÓ@ ¸´Ð@ ‹ SG ‰¸ÐÐ@ ‹¬PG ‰Ã‹Àƒ=‰G  t¡‰G Æ@¡‰G ‹ÿRø3À£‰G ƒ= ‰G  t¡ ‰G Æ@¡ ‰G èoÿÿ3À£ ‰G ¡ÌPG 3Ò‰¡ÐQG 3Ò‰¡0QG 3Ò‰¡´QG 3Ò‰¡ØQG 3Ò‰¡ SG 3Ò‰èûYÿÿ…ÀtèZÿÿPèìYÿÿZèÖþÿÿÃÄlÿÿÿÇ$”   Tè) ÿÿ…ÀtP‹D$£8G ‹D$£8G ‹D$£8G ƒ=8G u‹D$%ÿÿ  £8G ë	‹D$£8G ¸ 8G T$¹€   èñ~ÿÿÄ”   Ã‹À;8G |;8G u;8G ~3ÀÃ°Ã‹ÀU‹ìƒÄèS3Ò‰Uü‹Ø3ÀUh¦Ö@ dÿ0d‰ ÇEøÿÿÿÿEü‹ÓèÃ|ÿÿEüèÿÿEôP‹Eüè§€ÿÿPèM ÿÿ‹Ø…Ûts‹Ãè|Xÿÿ‰Eð3ÀUh‰Ö@ dÿ0d‰ ‹EðPS‹EôP‹Eüèr€ÿÿPè ÿÿ…Àt#EèPEìPh¸Ö@ ‹EðPè ÿÿ…Àt	‹Eì‹@‰Eø3ÀZYYd‰hÖ@ ‹Eðè4XÿÿÃéuÿÿëð3ÀZYYd‰h­Ö@ Eüèƒ{ÿÿÃéåtÿÿëð‹Eø[‹å]Ã   \   VW‹ú3Ò…Àtb€<8 t\…ÿu¶ ¶À£X8G sI²ëE‹÷NëN…ö|¶0¶É£X8G rë‹Ï+Îá  €yIƒÉþA…Éu²ë¶8¶À£X8G s²‹Â_^Ã@ SV‹ò‹Ø3À€=ÔˆG  t‹Ãèpÿÿ‹ÖJèlÿÿÿ^[Ã3É€=ÔˆG  tèXÿÿÿ‹È‹ÁÃ@ S‹Ø‹Ë…Étƒé‹	;Ñ~‹Ó…Òtƒê‹è   [ÃSVWU‹ê‹ø3ö…í°ë‹Ç…Àtƒè‹ ;ÅœÀ„Àu:‹õ€=ÔˆG  t/»   3ö;ë|$¶Dÿ¶À£X8G s‹Ó‹Çèö  ‹ØëCF;ë}Ü‹Æ]_^[ÃU‹ìƒÄôSVW‰Mø‰Uü‹ø‹Ç…Àtƒè‹ ‰Eô¾   »   ë F¶Dÿ¶À£X8G s‹Ó‹Çèž  ‹ØëC;]ô};uü|Ö;uüu";]ô}¶Dÿ¶À£X8G s‹Ó‹Çèk  H‹Ø‹Eø‰0‹E‰_^[‹å]Â SVWƒÄø‹Ú‹ð3À‰$…Û°ë‹Æ…Àtƒè‹ ;ÃœÀ„ÀuMƒû~E€=ÔˆG  t<TL$‹ûO‹×‹Æè&ÿÿÿ;|$~°ë‹Æ…Àtƒè‹ ;$žÀ„Àt3À‰$ëÿ$ë‰$‹$YZ_^[Ã@ SVƒÄø‹Ø3À‰$…Ò~V‹ó‹Æ…Àtƒè‹ ;Â}‹Æ…Àtƒè‹ ‹Ð€=ÔˆG  t,TL$‹Ãè©þÿÿ‹Æ…Àtƒè‹ ;$}‹Æ…Àtƒè‹ ‰$ë‰$‹$YZ^[Ã‹ÀS‹Ø€=ÔˆG  t
+Sè&Ÿÿÿ+Ã[Ã¸   [Ã@ PèŸÿÿÃSV‹ò‹Ø¸   €=ÔˆG  t ¶T3ÿ¶Ò£X8G s‹Ãèè|ÿÿÆHè¤ÿÿÿ^[ÃSV‹Ú‹ðC€=ÔˆG  t"¶Tÿ¶Ò£X8G s‹Æè²|ÿÿÃHènÿÿÿÃ^[ÃSV‹Ú‹ð…Û~‹Æ…Àtƒè‹ ;ÃÀë3À„Àt
+€|ÿ\”Àë3À„Àt‹Ó‹Æèáüÿÿ„À”À^[Ã3À^[ÃSVQ‹Ú‹ð‹Ã‹Öèxÿÿ‹‰$‹4$…ötƒî‹6‹‹ÖèŽÿÿÿ„Àu‹Ãº¤Ú@ è^zÿÿZ^[Ã  ÿÿÿÿ   \   SVWU‹ò‹Ø3ÿ‹Ãèÿ{ÿÿP‹Æè÷{ÿÿ‹è‹ÅZè©   ‹Ø…Ût‹û+ýG‹Ç]_^[Ã@ SVWU‹ú‹ð€=ÔˆG  ts‹Æ…Àtƒè‹ ‹è‹Ç‹ÕèA~ÿÿ»   ;ë|]‹Çè|ÿÿ¶TÿˆTÿ¶Dÿ¶À£X8G sC‹Çèß{ÿÿ¶TÿˆTÿë‹¶Dÿ¿,s‹ÇèÀ{ÿÿ€Dÿ C;ë}®ë	‹×‹Æè÷¶ÿÿ]_^[Ã‹ÀSVWUƒÄø‹ê‹ð3Û…ö„   €> t|…ítx€}  tr‹Æè	Áÿÿ‰$‹ÅèÿÀÿÿ‹ø‹Õ‹ÆèàÂÿÿ‹Øë?‹Ó+Ö‹Æè‘ûÿÿˆD$€|$tWUWSj h   èF˜ÿÿƒøt'€|$uCC‹Õ‹ÃèŸÂÿÿ‹Ø…Ût‹Ã+Æ‹$+Ð;úv°3Û‹ÃYZ]_^[ÃSVW‹Ú‹ð‹Ó‹Æè$   ‹ð‹þ„Ût…öt‹þF‹Ó‹Æè   ‹ð…öuî‹Ç_^[ÃSVW‹Ú‹ð‹Ó‹Æè(Âÿÿ‹ø…ÿt$‹×+Ö‹Æèëúÿÿ,rtëGG‹Ó‹ÇèÂÿÿ‹ø…ÿuÜ‹Ç_^[ÃU‹ìQSVW‹}ƒÇìWj èG˜ÿÿ3öë*¶D7¶\7*ØrCˆEÿ¶Eÿ¶À«X8G þEÿþËuëƒÆƒþ}¶D7
+D7uÆ_^[Y]Ã@ U‹ìƒÄìSVW¾ÈˆG Ç	  ÇF	   ÇF   èY˜ÿÿ…Àt‰f…Àt‹Ðfâÿ·Ò‰V·ÀÁè
+‰FV¾ˆÝ@ ¿X8G ¹   ó¥^ƒ=8G ~ƒ=8G uÆFëjJèžÿÿ…À•ÀˆFj*èÿÿ…À•Ãˆ^„ÛtUè	ÿÿÿY_^[‹å]Ã                                 U‹ì¹   j j IuùS3ÀUhsà@ dÿ0d‰ èÿÿÿèDèÿÿ€=ÔˆG  tèêÿÿè—ÿÿ‹ØEðP3Éº   ‹Ãèiçÿÿ‹Uð¸ˆG èxtÿÿEìP¹ˆà@ º   ‹ÃèGçÿÿ‹Eì3ÒèÁ·ÿÿ¢ˆG EèP¹ˆà@ º   ‹Ãè#çÿÿ‹Eè3Òè·ÿÿ¢ˆG ±,º   ‹ÃèRçÿÿ¢ˆG ±.º   ‹Ãè?çÿÿ¢ˆG EäP¹ˆà@ º   ‹ÃèÙæÿÿ‹Eä3ÒèS·ÿÿ¢ˆG ±/º   ‹Ãèçÿÿ¢ˆG EÜP¹”à@ º   ‹Ãè¢æÿÿ‹EÜUàèÓéÿÿ‹Uà¸ˆG è¦sÿÿEÔP¹¤à@ º    ‹Ãèuæÿÿ‹EÔUØè¦éÿÿ‹UØ¸ˆG èysÿÿ±:º   ‹Ãè›æÿÿ¢ˆG EÐP¹¼à@ º(   ‹Ãè5æÿÿ‹UÐ¸ ˆG èDsÿÿEÌP¹Èà@ º)   ‹Ãèæÿÿ‹UÌ¸$ˆG è"sÿÿEøèÆrÿÿEôè¾rÿÿEÈP¹ˆà@ º%   ‹Ãèáåÿÿ‹EÈ3Òè[¶ÿÿ…ÀuEüºÔà@ è&sÿÿëEüºàà@ èsÿÿEÄP¹ˆà@ º#   ‹Ãè¢åÿÿ‹EÄ3Òè¶ÿÿ…Àu?EÀP¹ˆà@ º  ‹Ãèåÿÿ‹EÀ3Òèùµÿÿ…ÀuEôºìà@ èÄrÿÿëEøºüà@ èµrÿÿÿuøÿuühá@ ÿuô¸(ˆG º   è”uÿÿÿuøÿuühá@ ÿuô¸,ˆG º   èwuÿÿ±,º   ‹ÃèYåÿÿ¢ÖˆG 3ÀZYYd‰hzà@ EÀº   èÚqÿÿÃékÿÿëë[‹å]Ã ÿÿÿÿ   0   ÿÿÿÿ   m/d/yy  ÿÿÿÿ   mmmm d, yyyy    ÿÿÿÿ   am  ÿÿÿÿ   pm  ÿÿÿÿ   h   ÿÿÿÿ   hh  ÿÿÿÿ    AMPM   ÿÿÿÿ   AMPM    ÿÿÿÿ   :mm ÿÿÿÿ   :mm:ss  $á@ TUnitHashArray       ÿÿÿÿ    SysUtils@ Tá@ TModuleInfo       á@    @ VS‰Æ1ÀÁÀŠ€û t€ûA|€ûZ€Ë 2ÃFëä[^ÃÃ‹ÀSVWUƒÄô‹ìSG ‹…Òt;Bt‹…Òuõ‰$ƒ<$ „å   ‹$ƒx „Ø   ‹$‹X€; t
+ÇD$$‰G ëÇD$™G ‹Cèsÿÿ‹è…íŒ”   E3ö<v‹Cƒ|ø t‹C‹øv‹K‹TÑ‰ëL‹Cƒ|ø tBv‹S‹DÂè4ÿÿÿ¹ý  3Ò÷ñ‰T$‹D$‹T$‹‹Sú;Âu‹C‹ø‹T$‹L$‰Š‹Cƒ<ø t‹C‹Døv‹K‹Ñ‰BFM…oÿÿÿ‹Pá@ ‹Ãè~ÿÿ‹$3Ò‰PƒÄ]_^[Ãÿ%è½G ‹Àèc’ÿÿè   ÃU‹ìƒÄìS3Ò‰Uì‹Ø3ÀUhSã@ dÿ0d‰ …Ût7‰]ðÆEô Uì‹Ãèâÿÿ‹Eì‰EøÆEüEðPj‹\SG ²¡`Œ@ èëÿÿ‹Ðë‹PTG ²¡`Œ@ è³êÿÿ‹Ð‰Z‹Âè3iÿÿ3ÀZYYd‰hZã@ EìèÖnÿÿÃé8hÿÿëð[‹å]ÃS‹Ø…ÛuèPÿÿÿ‹Ã[ÃSV³‹5T:G ëÿV‹Ø‹6„Ût…öuñ‹Ã^[ÃSV¾T:G ë‹‹‰º   ‹ÃèKÿÿƒ> ué^[ÃShìã@ è‘ÿÿ‹Ø…Ûthüã@ Sè„‘ÿÿ£|8G ƒ=|8G  u
+¸4œ@ £|8G [Ã  kernel32.dll    GetDiskFreeSpaceExA º   ’ðÁ@Ãºÿÿÿÿ’ðÁHÃ‡‰ÐÃ@ ’ðÁÃ‹ÀSVWUQè†cÿÿˆ$‹è3ÿ‹\½3À‰D½…Ût‹ó‹‹ÆèZJÿÿ…ÛuñGƒÿuÝ¶$€âü‹Åèr_ÿÿ€<$ ~‹ÅèébÿÿZ]_^[Ã@ U‹ìQè[ÿÿf‰Eþ¶Eþ2Eÿ$Y]Ã@ SVWUQ‰$‹ø‹ÇèÓÿÿÿ‹Øè0ÿÿ‹ð¶Ã‹l‡ë‹m …ít;uuô…íu7‹ÇèN   ‹è…íu*¸   è’Iÿÿ‹è‰uÇEÿÿÿ‰m ¶ÃD‡‹Õèÿÿÿ‰E ‹$‰(Z]_^[Ã@ ‹3É‰H‹3Ò‰PÃSV‹Ø‹ÃèQÿÿÿ¶À‹\ƒ…Ût'CºÿÿÿèÑþÿÿ‹ðþÿÿÿt
+èŽÿÿ‰Cë‹…ÛuÙ‹Ã^[Ã‹ÀSV„ÒtƒÄðèšaÿÿ‹Ú‹ð3Ò‹Æè9^ÿÿÇFÿÿ  j jÿjÿj è…Žÿÿ‰Fj j j j èuŽÿÿ‰FÇFÿÿÿÿ²¡l@ èÿ]ÿÿ‰F ‹Æ„Ûtèaÿÿd    ƒÄ‹Æ^[Ã‹ÀSVèÕaÿÿ‹Ú‹ð‹Æèz   ‹Ó€âü‹Æèâ]ÿÿ‹FPè	Žÿÿ‹FPè Žÿÿ‹F èØ]ÿÿ„Û~‹ÆèAaÿÿ^[Ã‹À‹@Pè¯ÿÿÃ‹À‹@Pè»ÿÿÃ‹À‹@Pè¯ÿÿÃ‹À‹PR‹@PèßÿÿÃ‹À‹PR‹@PèÏÿÿÃ‹ÀSVWUƒÄø‹è³èlŽÿÿ‹ø;}$„„   ‹Åèšÿÿÿ‹E(‰D$‹Ô‹E èþÿÿ‹$ƒx —Ã„Ût$EèOýÿÿëEºÿÿ  è`ýÿÿ‹ð…öt‹Åè‹ÿÿÿEº ÿÿèFýÿÿ=ÿÿ  uÒ‹Åè<ÿÿÿ„ÛtEèýÿÿ‰}$E(èýÿÿH;D$”ÃÿE‹ÃYZ]_^[ÃSQ‹Ø‹Ô‹C èzýÿÿÿKƒ{ u 3À‰C$Cºÿÿ  èãüÿÿ‹Ãèøþÿÿ‹Ãèåþÿÿ‹$ƒx u
+‹Ô‹C è¶ýÿÿZ[Ã@ SVWQ‹ø‹Ô‹G è(ýÿÿ‹$ÿ@‹$ƒx—Ãè[ÿÿ;G$t@„Ûu<‹Çè¯þÿÿë'Gè]üÿÿ‹ðþÿÿ  u‹Çèˆþÿÿj èéúÿÿ‹Çè†þÿÿGèBüÿÿ…À~ÍZ_^[ÃSQ‹Ø‹Ô‹C èºüÿÿ‹$ÿH‹$ƒx uH‹Ô‹C èýÿÿèäŒÿÿ;C$t4Cèóûÿÿ‹Èùÿÿ  u	‹Ãèþÿÿë…É‹Á¹ÿÿ  ™÷ù…Òu‹ÃèþÿÿZ[Ã‹3É‰‹Âè£[ÿÿÃ‹ÀSVW‹ù‹ò‹Ø…ÛtWVS‹ÿ…Àt3Àë°_^[Ã‹ÀU‹ìj SVW‹ù‹ò‹Ø3ÀUh÷è@ dÿ0d‰ …Ût9Eüè\ƒÿÿ‹Èºé@ ‹Ãèú[ÿÿ„Àt‹Ï‹Ö‹Eüè–ÿÿÿ„Àu‹Ï‹Ö‹ÃèÛ[ÿÿ„Àu3Àë°‹Ø3ÀZYYd‰hþè@ EüèƒÿÿÃé”bÿÿëð‹Ã_^[Y]Ã          À      FU‹ìƒÄôS‹ØRèÕŒÿÿ‰Eô3ÀUhŠé@ dÿ0d‰ Ù}þ3ÀUhlé@ dÿ0d‰ ‹ÃèhmÿÿPèVŒÿÿ‰Eø3ÀZYYd‰hsé@ ÛâÙmþÃébÿÿëó3ÀZYYd‰h‘é@ ‹EôPèsŒÿÿÃébÿÿëï‹Eø[‹å]Ã@ S‹ìSG ‹…Ûtƒ{ t‹Pá@ ‹Cèwÿÿ3À‰C‹…Ûuá[Ã‹À   P:G $SG H:G @RG @:G ´PG 8:G pSG 0:G ¤SG (:G lQG  :G ,RG :G |PG :G xRG :G ÈRG  :G üQG ø9G RG ð9G TG è9G  RG à9G „TG Ø9G SG Ð9G àRG È9G ˜TG À9G TTG ¸9G RG °9G $TG ¨9G 0TG  9G TQG ˜9G QG 9G ÜRG ˆ9G dSG €9G ˆPG x9G TG p9G RG (   h9G üSG     d9G ÄPG     `9G TSG     \9G ”PG     X9G ,QG     T9G $QG     P9G ÔPG     L9G RG     H9G SG     D9G (QG     @9G ÔRG     <9G  SG     89G ŒSG     49G SG     09G øQG     ,9G ¤QG     (9G PG     $9G ˆSG      9G  RG     9G QG     9G tRG     9G ìRG     9G ŒRG     9G ÌQG     9G ŒPG     9G 4RG      9G 4TG     ü8G àSG     ø8G ÐRG     ô8G PQG     ð8G  PG     ì8G ÐSG     è8G ÄTG     ä8G ÜPG     à8G xPG     Ü8G TG     Ø8G ÌRG     Ô8G hTG     °8G  RG     ¬8G \QG     U‹ì3ÀUh î@ dÿ0d‰ ÿ‰G …Y  ¸©G è‰ûÿÿ¸œá@ è÷}ÿÿèÊüÿÿè¹öÿÿèÌçÿÿ¸8G èBeÿÿ¸8G èìlÿÿ¸ 8G è.eÿÿ¸ˆG è$eÿÿ¸ˆG èeÿÿ¸ˆG èeÿÿ¸ ˆG èeÿÿ¸$ˆG èüdÿÿ¸(ˆG èòdÿÿ¸,ˆG èèdÿÿ¸0ˆG ¹   ‹”@ è3pÿÿ¸`ˆG ¹   ‹”@ èpÿÿ¸ˆG ¹   ‹”@ è	pÿÿ¸¬ˆG ¹   ‹”@ èôoÿÿ¸ØˆG ¹   ‹”@ èßoÿÿ¸‰G ‹@ èswÿÿ¸‰G ‹<@ ècwÿÿ¸x8G èUdÿÿ¸„8G ¹   ‹”@ è oÿÿ¸l9G ¹   ‹Ï@ è‹oÿÿ¸¤9G ¹   ‹ˆÏ@ èvoÿÿ3ÀZYYd‰h'î@ Ãék]ÿÿëø]Ã@ ÿ%¾G ‹Àÿ%¾G ‹Àÿ%¾G ‹Àÿ% ¾G ‹ÀU‹ì}   t¸@ €ë·EP·EP‹EP‹EPèÎÿÿÿ]Â ‹ÀU‹ì¸@ €]Â U‹ì¸@ €]Â U‹ì¸@ €]Â U‹ìj S3ÀUhúî@ dÿ0d‰ }   t»@ €ë Eü‹Uèáeÿÿ‹Eü‹Uè"§ÿÿƒà‹…X:G 3ÀZYYd‰hï@ Eüè/cÿÿÃé‘\ÿÿëð‹Ã[Y]Â @ U‹ìj S3ÀUhfï@ dÿ0d‰ }   t»@ €ë Eü‹Uèueÿÿ‹Eü‹Uèn¼ÿÿƒà‹…X:G 3ÀZYYd‰hmï@ EüèÃbÿÿÃé%\ÿÿëð‹Ã[Y]Â @ U‹ìj S3ÀUhÒï@ dÿ0d‰ }   t»@ €ë Eü‹Uè	eÿÿ‹Eü‹UèÖ»ÿÿƒà‹…X:G 3ÀZYYd‰hÙï@ EüèWbÿÿÃé¹[ÿÿëð‹Ã[Y]Â @ U‹ìj S3ÀUh>ð@ dÿ0d‰ }   t»@ €ë Eü‹Uèdÿÿ‹Eü‹UèZÔÿÿƒà‹…X:G 3ÀZYYd‰hEð@ EüèëaÿÿÃéM[ÿÿëð‹Ã[Y]Â @ U‹ìj S3ÀUhªð@ dÿ0d‰ }   t»@ €ë Eü‹Uè1dÿÿ‹Eü‹UèV»ÿÿƒà‹…X:G 3ÀZYYd‰h±ð@ EüèaÿÿÃéáZÿÿëð‹Ã[Y]Â @ U‹ìƒÄøS3À‰Eø3ÀUh)ñ@ dÿ0d‰ }   t»@ €ë-Eø‹Uè¿cÿÿ‹EøUÿèT¦ÿÿƒà‹…X:G €}ÿõÀ‹Uf‰3ÀZYYd‰h0ñ@ Eøè aÿÿÃébZÿÿëð‹Ã[YY]Â @ U‹ìj S‹E…Àt3Ò‰3ÀUhœñ@ dÿ0d‰ }   t»@ €ëÿuÿuEüèÃ¹ÿÿ‹Uü‹Eè¨iÿÿ3Û3ÀZYYd‰h£ñ@ Eüè`ÿÿÃéïYÿÿëð‹Ã[Y]Â U‹ìj S‹E…Àt3Ò‰3ÀUhò@ dÿ0d‰ }   t»@ €ëÿuÿuEü3ÒèmÉÿÿ‹E‹Uüè6iÿÿ3Û3ÀZYYd‰hò@ Eüè`ÿÿÃé}Yÿÿëð‹Ã[Y]Â @ U‹ìj S‹E…Àt3Ò‰3ÀUh„ò@ dÿ0d‰ }   t»@ €ëfƒ}À@Mü3Òè‹¥ÿÿ‹Uü‹EèÀhÿÿ3Û3ÀZYYd‰h‹ò@ Eüè¥_ÿÿÃéYÿÿëð‹Ã[Y]Â ÿ%ü½G ‹Àÿ%ø½G ‹Àÿ%ô½G ‹Àÿ%ð½G ‹ÀU‹ìS‹Ú‹Ó‹Mƒyü tP‹E‹@üPè‚‚ÿÿ‹Ð…Òu‹Ó‹Â[]ÃU‹ìQhØô@ è^‚ÿÿ‰EüUºLî@ ¸èô@ è³ÿÿÿY£©G Uº|î@ ¸üô@ èÿÿÿY£©G Uº|î@ ¸õ@ è‡ÿÿÿY£©G Uºˆî@ ¸õ@ èqÿÿÿY£©G Uºˆî@ ¸õ@ è[ÿÿÿY£ ©G Uºˆî@ ¸õ@ èEÿÿÿY£$©G Uºˆî@ ¸$õ@ è/ÿÿÿY£(©G Uºˆî@ ¸,õ@ èÿÿÿY£,©G Uºˆî@ ¸4õ@ èÿÿÿY£0©G Uºˆî@ ¸<õ@ èíþÿÿY£4©G Uºˆî@ ¸Dõ@ è×þÿÿY£8©G Uºˆî@ ¸Lõ@ èÁþÿÿY£<©G Uº”î@ ¸Tõ@ è«þÿÿY£@©G Uº î@ ¸\õ@ è•þÿÿY£D©G Uºï@ ¸lõ@ èþÿÿY£H©G Uºxï@ ¸|õ@ èiþÿÿY£L©G Uºäï@ ¸Œõ@ èSþÿÿY£P©G UºPð@ ¸œõ@ è=þÿÿY£T©G Uº¼ð@ ¸¬õ@ è'þÿÿY£X©G Uº<ñ@ ¸¼õ@ èþÿÿY£\©G Uº¬ñ@ ¸Ìõ@ èûýÿÿY£`©G Uº ò@ ¸Üõ@ èåýÿÿY£d©G Y]Ãoleaut32.dll    VariantChangeTypeEx VarNeg  VarNot  VarAdd  VarSub  VarMul  VarDiv  VarIdiv VarMod  VarAnd  VarOr   VarXor  VarCmp  VarI4FromStr    VarR4FromStr    VarR8FromStr    VarDateFromStr  VarCyFromStr    VarBoolFromStr  VarBstrFromCy   VarBstrFromDate VarBstrFromBool U‹ì3ÀUhö@ dÿ0d‰ ÿh©G 3ÀZYYd‰hö@ ÃézUÿÿëø]Ã‹ÀÌƒD$ø‹D$‹ ÿ ƒD$øéðW  ƒD$øéòW  ö@ *ö@ 4ö@            À      F>ö@        ‹À¸ö@ Jö@                         ôö@    °@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ 8MA <NA ÈMA üMA ÜMA NA ÄMA 8LA pLA üLA `3@ `3@ ,LA NA ÄLA ¸LA TCustomVariantType÷@ TCustomVariantType¸ö@ @   Variants  @ „÷@                             „÷@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantInvalidOpErrorè÷@                             è÷@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantTypeCastError‹ÀLø@                             Lø@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantOverflowError‹À°ø@                             °ø@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantInvalidArgErrorù@                             ù@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantBadVarTypeErrorxù@                             xù@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantBadIndexError‹ÀÜù@                             Üù@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantArrayLockedError@ Dú@                             Dú@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantArrayCreateError@ ¬ú@                             ¬ú@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantNotImplError@ û@                             û@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantOutOfMemoryError@ xû@                             xû@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantUnexpectedErrorÜû@                             Üû@    ìŠ@ DF@ PF@ TF@ XF@ LF@ ”C@ °C@ ìC@ EVariantDispatchError‹ÀU‹ìj 3ÀUh>ü@ dÿ0d‰ Uü¡ÈRG èÐtÿÿ‹Mü²¡œ÷@ èÑÿÿèHPÿÿ3ÀZYYd‰hEü@ EüèëUÿÿÃéMOÿÿëðY]ÃU‹ìƒÄäSV3É‰Mì‰Mè‰Mä‹ò‹Ø3ÀUh×ü@ dÿ0d‰ Uì‹Ãè‘M  ‹Eì‰EðÆEôUè‹Æè}M  ‹Eè‰EøÆEüEðPjUä¡„PG è<tÿÿ‹Mä²¡œ÷@ è­Ðÿÿè´Oÿÿ3ÀZYYd‰hÞü@ Eäº   èvUÿÿÃé´Nÿÿëë^[‹å]ÃU‹ìj 3ÀUh.ý@ dÿ0d‰ Uü¡xRG èàsÿÿ‹Mü²¡8÷@ èÐÿÿèXOÿÿ3ÀZYYd‰h5ý@ EüèûTÿÿÃé]NÿÿëðY]ÃU‹ìƒÄäSV3É‰Mì‰Mè‰Mä‹ò‹Ø3ÀUhÇý@ dÿ0d‰ Uì‹Ãè¡L  ‹Eì‰EðÆEôUè‹ÆèL  ‹Eè‰EøÆEüEðPjUä¡(SG èLsÿÿ‹Mä²¡ ø@ è½ÏÿÿèÄNÿÿ3ÀZYYd‰hÎý@ Eäº   è†TÿÿÃéÄMÿÿëë^[‹å]ÃU‹ìj 3ÀUhþ@ dÿ0d‰ Uü¡,RG èðrÿÿ‹Mü²¡øù@ è%ÏÿÿèhNÿÿ3ÀZYYd‰h%þ@ EüèTÿÿÃémMÿÿëðY]ÃU‹ì¹   j j IuùS‹Ø3ÀUhm A dÿ0d‰ ‹Ã=
+ €9„š   = €tW-@ €„ø   -þ¿  „\  éz  - €t?Htbék  - €„‚   ƒè„Ÿ   -  „à   ƒèI„ý   é>  è8ýÿÿé„  Uü¡,TG èrÿÿ‹Mü²¡Èø@ èKÎÿÿèŽMÿÿé^  èøýÿÿéT  Uø¡ôPG èæqÿÿ‹Mø²¡ ø@ èÎÿÿè^Mÿÿé.  Uô¡¤SG èÀqÿÿ‹Mô²¡,ù@ èõÍÿÿè8Mÿÿé  Uð¡”TG èšqÿÿ‹Mð²¡ù@ èÏÍÿÿèMÿÿéâ   Uì¡èRG ètqÿÿ‹Mì²¡`ú@ è©ÍÿÿèìLÿÿé¼   Uè¡HQG èNqÿÿ‹Mè²¡Äú@ èƒÍÿÿèÆLÿÿé–   Uä¡lQG è(qÿÿ‹Mä²¡dø@ è]Íÿÿè LÿÿësUà¡ðPG èqÿÿ‹Mà²¡,û@ è:Íÿÿè}LÿÿëP¡8TG ‹ ‰EÈÆEÌ‰]ÐÆEÔ UÄ‹Ãè Åÿÿ‹EÄ‰EØÆEÜEÈPjUÀ¡0RG è³pÿÿ‹MÀ²¡ìŠ@ è$Íÿÿè+Lÿÿ3ÀZYYd‰ht A EÀº   èíQÿÿEàº   èàQÿÿÃéKÿÿëÞ[‹å]Ã@ …Àtè£ýÿÿÃ‹ÀS…Àt,‹Øë €tƒëtë‹Â‹Ñè¡ûÿÿë‹Â‹Ñè†üÿÿëèoýÿÿ[ÃSV‹ò‹Øè].ÿÿ‹ †@ è¶Dÿÿ„Àt‹Î‹Ó¸
+ €è¤ÿÿÿ^[Ãè8.ÿÿ‹¼‡@ è‘Dÿÿ„Àt‹Î‹Ó¸
+ €èÿÿÿë2è.ÿÿ‹$‰@ èmDÿÿ„Àt‹Î‹Ó¸ €è[ÿÿÿëè0.ÿÿ‹Ð‹Âè3Kÿÿ^[ÃU‹ìj 3ÀUhŠA dÿ0d‰ Uü¡|PG è„oÿÿ‹Mü²¡û@ è¹ËÿÿèüJÿÿ3ÀZYYd‰h‘A EüèŸPÿÿÃéJÿÿëðY]ÃS‹Ø‹ÃèŽ  fÇ [Ã@ U‹ìS‹MÁ ýÿÿ‹TÁÁ‹];”ƒ ÿÿÿŸÂH„Òt…À}ã‹Â[]ÃU‹ìSV²‹Mÿ„ ÿÿÿ‹M‹ŒÁýÿÿ‹Ù‹uœÆ ýÿÿ‹u;œ† ÿÿÿ"…Àu3Òë‹U‹U‰Œ‚ ÿÿÿ‹URHè®ÿÿÿY‹Ð‹Â^[]ÃU‹ìÄèüÿÿSVW‰…üüÿÿ‹…üüÿÿö@ u
+¸W €è þÿÿ‹…üüÿÿ· ‹Ðfâÿfƒú…"  ‹•üüÿÿöÄ@t‹…üüÿÿ‹@‹ ‰…øüÿÿë‹…üüÿÿ‹@‰…øüÿÿ‹…øüÿÿ· ‰…ðüÿÿ‹ðüÿÿK…Û|kC3ÿµ ýÿÿ‹Æ‰…èüÿÿ‹…èüÿÿƒÀPGP‹…øüÿÿPè´ïÿÿèýÿÿ…ôüÿÿPGP‹…øüÿÿPè ïÿÿèsýÿÿ‹…èüÿÿ‹•ôüÿÿ+PB‹…èüÿÿ‰GƒÆKuž‹ðüÿÿK…Û|C…ýÿÿ• ÿÿÿ‹‰
+ƒÂƒÀKuóU‹ðüÿÿK‹ÃèLþÿÿY„Àt*…ìüÿÿP… ÿÿÿP‹…øüÿÿPè1ïÿÿèüüÿÿ‹…ìüÿÿè¡   U‹ÃèEþÿÿY„Àuµ‹…üüÿÿPèêÿÿèÓüÿÿ_^[‹å]ÃSVQ‹Ø·3fƒþsSèpêÿÿè³üÿÿë\fþ ufÇ  CèINÿÿëFfþu
+‹Ãÿ€©G ë5f÷Æ  t	‹Ãè4þÿÿë%‹Ô‹ÆèYJ  „Àt‹Ó‹$‹ÿQ$ëSèêÿÿSèêÿÿZ^[Ãf÷ è¿ufÇ   ÃèrÿÿÿÃPèæÿÿÿXÃU‹ìS‹MÁ ýÿÿ‹TÁÁ‹];”ƒ ÿÿÿŸÂH„Òt…À}ã‹Â[]ÃU‹ìSV²‹Mÿ„ ÿÿÿ‹M‹ŒÁýÿÿ‹Ù‹uœÆ ýÿÿ‹u;œ† ÿÿÿ"…Àu3Òë‹U‹U‰Œ‚ ÿÿÿ‹URHè®ÿÿÿY‹Ð‹Â^[]ÃU‹ìÄàüÿÿSVW‰øüÿÿ‹Ú‰…üüÿÿöC u
+¸W €è~ûÿÿ·‹Ðfâÿfƒú…s  öÄ@t‹C‹ ‰…ìüÿÿë	‹C‰…ìüÿÿ‹…ìüÿÿ· ‰…ðüÿÿ‹ðüÿÿK…Û|kC3ÿµ ýÿÿ‹Æ‰…àüÿÿ‹…àüÿÿƒÀPGP‹…ìüÿÿPè*íÿÿèûÿÿ…ôüÿÿPGP‹…ìüÿÿPèíÿÿèéúÿÿ‹…àüÿÿ‹•ôüÿÿ+PB‹…àüÿÿ‰GƒÆKuž… ýÿÿP‹…ðüÿÿPjèÍìÿÿ‹ð…öuèøÿÿ‹…üüÿÿèOþÿÿ‹…üüÿÿfÇ  ‹…üüÿÿ‰p‹ðüÿÿK…Û|C…ýÿÿ• ÿÿÿ‹‰
+ƒÂƒÀKuóU‹ðüÿÿK‹Ãè#þÿÿY„ÀtL…èüÿÿP… ÿÿÿP‹…ìüÿÿPèhìÿÿè3úÿÿ…äüÿÿP… ÿÿÿPVèOìÿÿèúÿÿ‹…èüÿÿ‹Ð‹…äüÿÿÿ•øüÿÿU‹ÃèúýÿÿY„Àu“ëS‹…üüÿÿPèªçÿÿèåùÿÿ_^[‹å]Ã‹Àè¯   Ã‹ÀSVWQ‹ò‹Øf÷è¿t‹Ãèòüÿÿ·>fƒÿsVSènçÿÿè©ùÿÿëyfÿ ufÇ 3À‰CC‹Vè‹Kÿÿë[fÿuf‰;‹F‰C‹Ãÿˆ©G ëAf÷Ç  t¹ A ‹Ö‹Ãè²ýÿÿë*‹Ô‹Çè7G  „Àtj ‹Î‹Ó‹D$‹ÿS(ëVSèóæÿÿè.ùÿÿZ_^[ÃSV‹Ú‹ð;ót6f÷è¿u&f÷è¿t‹Æè=üÿÿ‹‰‹C‰F‹C‰F‹C‰Fë	‹Ó‹Æèÿÿÿ^[ÃU‹ìƒÄðSVW‹ù‹ò‹ØEðPè|æÿÿ3ÀUhôA dÿ0d‰ ‹ÖEðèŒÿÿÿEðÿ„©G ·ÏUð‹ÃèB  3ÀZYYd‰hûA Eðè9üÿÿÃé—Cÿÿëð_^[‹å]Ã‹ÀU‹ìj S‹Ø3ÀUhBA dÿ0d‰ Eüè.6  ‹Ã‹UüèÈ?  3ÀZYYd‰hIA 
